@@ -1,0 +1,202 @@
+﻿[36mvite v6.3.5 [32mbuilding for production...[36m[39m
+transforming...
+[32mΓ£ô[39m 20 modules transformed.
+node.exe : 
+[31mΓ£ù[39m Build 
+failed in 6.90s
+At line:1 char:1
++ & "C:\Program Files
+\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: ([31mΓ£   
+ ù[39m Build fai    
+led in 6.90s:Str    
+ing) [], RemoteE    
+xception
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+[31merror during 
+build:
+[31m[vite:esbuild] 
+Transform failed 
+with 5 errors:
+C:/Users/CMRU/Desktop
+/PDIEKYA/EKYA PDI/src
+/app/components/Admin
+Dashboard.tsx:577:18:
+ ERROR: Unexpected 
+closing "CardHeader" 
+tag does not match 
+opening "div" tag
+C:/Users/CMRU/Desktop
+/PDIEKYA/EKYA PDI/src
+/app/components/Admin
+Dashboard.tsx:673:16:
+ ERROR: Unexpected 
+closing "Card" tag 
+does not match 
+opening "CardHeader" 
+tag
+C:/Users/CMRU/Desktop
+/PDIEKYA/EKYA PDI/src
+/app/components/Admin
+Dashboard.tsx:674:13:
+ ERROR: The 
+character "}" is not 
+valid inside a JSX 
+element
+C:/Users/CMRU/Desktop
+/PDIEKYA/EKYA PDI/src
+/app/components/Admin
+Dashboard.tsx:1076:12
+: ERROR: Unexpected 
+closing "div" tag 
+does not match 
+opening "Card" tag
+C:/Users/CMRU/Desktop
+/PDIEKYA/EKYA PDI/src
+/app/components/Admin
+Dashboard.tsx:1077:21
+: ERROR: 
+Unterminated regular 
+expression[31m
+file: [36mC:/Users/C
+MRU/Desktop/PDIEKYA/E
+KYA PDI/src/app/compo
+nents/AdminDashboard.
+tsx:577:18[31m
+[33m
+[33mUnexpected 
+closing "CardHeader" 
+tag does not match 
+opening "div" 
+tag[33m
+575|                 
+       </Dialog>
+576|                 
+     </div>
+577|                 
+ </CardHeader>
+   |                 
+   ^
+578|                 
+ <CardContent 
+className="p-0">
+579|                 
+   <Table>
+
+[33mUnexpected 
+closing "Card" tag 
+does not match 
+opening "CardHeader" 
+tag[33m
+671|                 
+   </Table>
+672|                 
+ </CardContent>
+673|                
+</Card>
+   |                 
+ ^
+674|              )}
+675|  
+
+[33mThe character 
+"}" is not valid 
+inside a JSX 
+element[33m
+672|                 
+ </CardContent>
+673|                
+</Card>
+674|              )}
+   |               ^
+675|  
+676|              
+{activeView === 
+'announcements' && (
+
+[33mUnexpected 
+closing "div" tag 
+does not match 
+opening "Card" 
+tag[33m
+1074|              
+})()}
+1075|  
+1076|            
+</div>
+   |              ^
+1077|          
+</ScrollArea>
+1078|        </main>
+
+[33mUnterminated 
+regular 
+expression[33m
+1075|  
+1076|            
+</div>
+1077|          
+</ScrollArea>
+   |                 
+      ^
+1078|        </main>
+1079|      </div>
+[31m
+    at 
+failureErrorWithLog (
+C:\Users\CMRU\Desktop
+\PDIEKYA\EKYA PDI\nod
+e_modules\esbuild\lib
+\main.js:1467:15)
+    at C:\Users\CMRU\
+Desktop\PDIEKYA\EKYA 
+PDI\node_modules\esbu
+ild\lib\main.js:736:5
+0
+    at responseCallba
+cks.<computed> (C:\Us
+ers\CMRU\Desktop\PDIE
+KYA\EKYA PDI\node_mod
+ules\esbuild\lib\main
+.js:603:9)
+    at 
+handleIncomingPacket 
+(C:\Users\CMRU\Deskto
+p\PDIEKYA\EKYA PDI\no
+de_modules\esbuild\li
+b\main.js:658:12)
+    at Socket.readFro
+mStdout (C:\Users\CMR
+U\Desktop\PDIEKYA\EKY
+A PDI\node_modules\es
+build\lib\main.js:581
+:7)
+    at Socket.emit 
+(node:events:508:28)
+    at addChunk (node
+:internal/streams/rea
+dable:559:12)
+    at readableAddChu
+nkPushByteMode (node:
+internal/streams/read
+able:510:3)
+    at Readable.push 
+(node:internal/stream
+s/readable:390:5)
+    at 
+Pipe.onStreamRead (no
+de:internal/stream_ba
+se_commons:189:23)[3
+9m
