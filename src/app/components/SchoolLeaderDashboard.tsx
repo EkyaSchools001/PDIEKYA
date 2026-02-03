@@ -11,7 +11,7 @@ import { Textarea } from '@/app/components/ui/textarea';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
-import { LogOut, ClipboardCheck, Users, BarChart3, PlusCircle, FileText, ChevronRight, BookOpen, Calendar } from 'lucide-react';
+import { LogOut, ClipboardCheck, Users, BarChart3, PlusCircle, FileText, ChevronRight, BookOpen, Calendar, MapPin, Clock, Zap } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/app/components/ui/dialog';
 import ProfileDashboard from '@/app/components/ProfileDashboard';
 import MasterObservationForm from '@/app/components/MasterObservationForm';
@@ -58,6 +58,8 @@ export default function SchoolLeaderDashboard() {
   const [reportTimeframe, setReportTimeframe] = useState('all');
   const [reportCampus, setReportCampus] = useState('all');
   const [trainingViewMode, setTrainingViewMode] = useState<'calendar' | 'analytics'>('calendar');
+  const [selectedTrainingEvent, setSelectedTrainingEvent] = useState<any>(null);
+  const [trainingDetailDialogOpen, setTrainingDetailDialogOpen] = useState(false);
 
   // Observation form state
   const [selectedTeacher, setSelectedTeacher] = useState('');
@@ -218,7 +220,8 @@ export default function SchoolLeaderDashboard() {
   const handleRegisterTraining = (event: any) => {
     // School leaders might not register themselves, but we can provide a placeholder
     // or allow them to view details. For now, we'll keep it consistent with the interface.
-    console.log('Leader registering/viewing event:', event);
+    setSelectedTrainingEvent(event);
+    setTrainingDetailDialogOpen(true);
   };
 
   const getTrainingStatus = (eventId: string) => {
@@ -796,6 +799,66 @@ export default function SchoolLeaderDashboard() {
 
                 {trainingViewMode === 'calendar' ? (
                   <div className="space-y-8">
+                    {/* Glassmorphic Live Agenda Card */}
+                    <Card className="relative overflow-hidden bg-white/40 backdrop-blur-3xl border border-white/20 shadow-[0_8px_32px_0_rgba(163,127,188,0.1)] rounded-[3rem] p-10 group">
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#A37FBC]/20 to-blue-500/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:scale-110 transition-transform duration-1000"></div>
+                      <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-emerald-500/10 to-[#A37FBC]/20 rounded-full -ml-24 -mb-24 blur-3xl group-hover:scale-110 transition-transform duration-1000"></div>
+
+                      <div className="relative z-10">
+                        <div className="flex items-center gap-4 mb-8">
+                          <div className="p-3 bg-white/80 rounded-2xl shadow-sm border border-white/50">
+                            <Zap className="h-6 w-6 text-[#A37FBC] animate-pulse" />
+                          </div>
+                          <div>
+                            <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter">Live PD Agenda</h3>
+                            <p className="text-[10px] font-black text-[#A37FBC] uppercase tracking-[0.3em]">Institutional Growth Pulse</p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          {getTrainingEvents().filter(e => e.status !== 'Completed').slice(0, 2).map((event, idx) => (
+                            <div
+                              key={event.id}
+                              onClick={() => handleRegisterTraining(event)}
+                              className="relative bg-white/20 backdrop-blur-md rounded-[2rem] p-6 border border-white/30 hover:bg-white/40 hover:scale-[1.02] cursor-pointer transition-all duration-500 group/item flex flex-col justify-between"
+                            >
+                              <div className="relative z-10">
+                                <div className="flex justify-between items-start mb-4">
+                                  <Badge className="bg-white/80 text-[#A37FBC] border-none rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest shadow-sm">
+                                    {event.topic}
+                                  </Badge>
+                                  <div className="flex flex-col items-end">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Status</p>
+                                    <Badge className={`rounded-full px-3 py-0.5 text-[8px] font-black uppercase tracking-widest border-none ${event.status === 'Open' ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'
+                                      }`}>
+                                      {event.status}
+                                    </Badge>
+                                  </div>
+                                </div>
+                                <h4 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-4 group-hover/item:text-[#A37FBC] transition-colors">{event.title}</h4>
+                              </div>
+                              <div className="space-y-3 relative z-10">
+                                <div className="flex items-center gap-3 text-slate-600">
+                                  <Clock className="h-3.5 w-3.5 opacity-60" />
+                                  <span className="text-[10px] font-black uppercase tracking-widest">{event.time}</span>
+                                </div>
+                                <div className="flex items-center gap-3 text-slate-600">
+                                  <MapPin className="h-3.5 w-3.5 opacity-60" />
+                                  <span className="text-[10px] font-black uppercase tracking-widest">{event.campus}</span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          {getTrainingEvents().filter(e => e.status !== 'Completed').length === 0 && (
+                            <div className="col-span-2 p-12 text-center bg-white/10 rounded-[2.5rem] border border-dashed border-white/30">
+                              <Calendar className="h-10 w-10 text-white/50 mx-auto mb-4" />
+                              <p className="text-white/70 font-black uppercase tracking-widest text-[10px]">No active work streams detected in this cycle</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+
                     <TrainingCalendar
                       events={getTrainingEvents()}
                       onRegister={handleRegisterTraining}
@@ -1202,6 +1265,107 @@ export default function SchoolLeaderDashboard() {
                     </Button>
                   </div>
                 </div>
+              </DialogContent>
+            </Dialog>
+
+            {/* Glassmorphic Event Details Dialog */}
+            <Dialog open={trainingDetailDialogOpen} onOpenChange={setTrainingDetailDialogOpen}>
+              <DialogContent className="max-w-2xl bg-white/60 backdrop-blur-3xl border border-white/40 rounded-[3rem] shadow-2xl p-12 overflow-hidden">
+                {selectedTrainingEvent && (
+                  <>
+                    <div
+                      className="absolute top-0 left-0 w-full h-2 rounded-t-[3rem]"
+                      style={{ backgroundColor: selectedTrainingEvent.color }}
+                    />
+                    <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#A37FBC]/10 rounded-full blur-3xl" />
+                    <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl" />
+
+                    <DialogHeader className="mb-10 relative z-10">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <DialogTitle className="text-4xl font-black text-slate-900 uppercase tracking-tighter mb-2">
+                            {selectedTrainingEvent.title}
+                          </DialogTitle>
+                          <div className="flex items-center gap-4">
+                            <p className="text-[12px] font-black uppercase tracking-[0.2em]" style={{ color: selectedTrainingEvent.color }}>
+                              {selectedTrainingEvent.topic}
+                            </p>
+                            <span className="text-slate-300">•</span>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{selectedTrainingEvent.id}</p>
+                          </div>
+                        </div>
+                        <Badge
+                          className="rounded-full px-6 py-2 text-[10px] font-black uppercase tracking-widest border-none shadow-xl"
+                          style={{
+                            backgroundColor: selectedTrainingEvent.status === 'Completed' ? '#10B981' : selectedTrainingEvent.color,
+                            color: 'white'
+                          }}
+                        >
+                          {selectedTrainingEvent.status}
+                        </Badge>
+                      </div>
+                    </DialogHeader>
+
+                    <div className="space-y-8 relative z-10">
+                      <div className="grid grid-cols-2 gap-8">
+                        <div className="bg-white/40 backdrop-blur-md p-8 rounded-[2rem] border border-white/50 shadow-sm group hover:bg-white/50 transition-all">
+                          <div className="flex items-center gap-4 mb-3">
+                            <div className="p-2 bg-white/80 rounded-xl shadow-sm">
+                              <Calendar className="h-4 w-4" style={{ color: selectedTrainingEvent.color }} />
+                            </div>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Event Session</span>
+                          </div>
+                          <p className="text-lg font-black text-slate-900 tracking-tight">
+                            {new Date(selectedTrainingEvent.date).toLocaleDateString(undefined, { dateStyle: 'long' })}
+                          </p>
+                          <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">{selectedTrainingEvent.time}</p>
+                        </div>
+
+                        <div className="bg-white/40 backdrop-blur-md p-8 rounded-[2rem] border border-white/50 shadow-sm group hover:bg-white/50 transition-all">
+                          <div className="flex items-center gap-4 mb-3">
+                            <div className="p-2 bg-white/80 rounded-xl shadow-sm">
+                              <Clock className="h-4 w-4" style={{ color: selectedTrainingEvent.color }} />
+                            </div>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Enrollment Cap</span>
+                          </div>
+                          <p className="text-lg font-black text-slate-900 tracking-tight">
+                            {selectedTrainingEvent.enrolled} <span className="text-slate-300">/</span> {selectedTrainingEvent.capacity}
+                          </p>
+                          <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">Reserved Seats</p>
+                        </div>
+
+                        <div className="bg-white/40 backdrop-blur-md p-8 rounded-[2rem] border border-white/50 shadow-sm group hover:bg-white/50 transition-all">
+                          <div className="flex items-center gap-4 mb-3">
+                            <div className="p-2 bg-white/80 rounded-xl shadow-sm">
+                              <MapPin className="h-4 w-4" style={{ color: selectedTrainingEvent.color }} />
+                            </div>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Institutional Hub</span>
+                          </div>
+                          <p className="text-lg font-black text-slate-900 tracking-tight">{selectedTrainingEvent.campus}</p>
+                          <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest tracking-tighter">Campus Location</p>
+                        </div>
+
+                        <div className="bg-white/40 backdrop-blur-md p-8 rounded-[2rem] border border-white/50 shadow-sm group hover:bg-white/50 transition-all">
+                          <div className="flex items-center gap-4 mb-3">
+                            <div className="p-2 bg-white/80 rounded-xl shadow-sm">
+                              <Zap className="h-4 w-4" style={{ color: selectedTrainingEvent.color }} />
+                            </div>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Registration Status</span>
+                          </div>
+                          <p className="text-lg font-black text-slate-900 tracking-tight">{selectedTrainingEvent.status}</p>
+                          <p className="text-xs font-bold text-slate-500 mt-1 uppercase tracking-widest">Active Phase</p>
+                        </div>
+                      </div>
+
+                      <div className="bg-white/40 backdrop-blur-md p-10 rounded-[2.5rem] border border-white/50">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 text-center">Executive Brief</p>
+                        <p className="text-sm font-semibold text-slate-600 leading-relaxed text-center italic">
+                          This professional development session focuses on "{selectedTrainingEvent.title}" at the {selectedTrainingEvent.campus} campus. It is part of our ongoing commitment to institutional excellence and faculty growth.
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
               </DialogContent>
             </Dialog>
 
