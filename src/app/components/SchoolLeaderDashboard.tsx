@@ -895,45 +895,47 @@ export default function SchoolLeaderDashboard() {
                     </div>
 
                     <Card className="bg-white/60 backdrop-blur-md border-none rounded-[3rem] shadow-sm overflow-hidden">
-                      <CardHeader className="p-10 border-b border-black/[0.02]">
-                        <div className="flex justify-between items-center">
+                      <CardHeader className="p-6 sm:p-10 border-b border-black/[0.02]">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                           <div>
-                            <CardTitle className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Participation Report</CardTitle>
-                            <CardDescription className="text-sm font-semibold text-slate-400 mt-1 uppercase tracking-widest">Faculty Attendance & Engagement</CardDescription>
+                            <CardTitle className="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-tighter">Participation Report</CardTitle>
+                            <CardDescription className="text-[10px] sm:text-sm font-semibold text-slate-400 mt-1 uppercase tracking-widest">Faculty Attendance & Engagement</CardDescription>
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent className="p-0">
-                        <Table>
-                          <TableHeader className="bg-slate-50/50">
-                            <TableRow className="border-b border-black/[0.03]">
-                              <TableHead className="pl-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">Faculty Name</TableHead>
-                              <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Campus</TableHead>
-                              <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Events Attended</TableHead>
-                              <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest w-1/3">Participation Rate</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {pdStats.map((t) => (
-                              <TableRow key={t.empId} className="border-b border-black/[0.01] hover:bg-[#A37FBC]/[0.02] transition-colors group">
-                                <TableCell className="pl-10">
-                                  <div className="font-black text-slate-900 tracking-tight">{t.name}</div>
-                                  <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wide mt-0.5">{t.designation}</div>
-                                </TableCell>
-                                <TableCell className="font-bold text-slate-500 text-xs">{t.campus}</TableCell>
-                                <TableCell className="font-black text-slate-900 text-xs">
-                                  {t.attended} <span className="text-slate-300">/</span> {t.totalEvents}
-                                </TableCell>
-                                <TableCell className="pr-10">
-                                  <div className="flex items-center gap-4">
-                                    <Progress value={t.rate} className="h-2 bg-slate-100 flex-1" />
-                                    <span className="text-xs font-black text-[#A37FBC] w-8">{t.rate}%</span>
-                                  </div>
-                                </TableCell>
+                      <CardContent className="p-0 overflow-x-auto">
+                        <div className="min-w-[800px]">
+                          <Table>
+                            <TableHeader className="bg-slate-50/50">
+                              <TableRow className="border-b border-black/[0.03]">
+                                <TableHead className="pl-6 sm:pl-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">Faculty Name</TableHead>
+                                <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Campus</TableHead>
+                                <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Events Attended</TableHead>
+                                <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest w-1/3">Participation Rate</TableHead>
                               </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
+                            </TableHeader>
+                            <TableBody>
+                              {pdStats.map((t) => (
+                                <TableRow key={t.empId} className="border-b border-black/[0.01] hover:bg-[#A37FBC]/[0.02] transition-colors group">
+                                  <TableCell className="pl-6 sm:pl-10">
+                                    <div className="font-black text-slate-900 tracking-tight">{t.name}</div>
+                                    <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wide mt-0.5">{t.designation}</div>
+                                  </TableCell>
+                                  <TableCell className="font-bold text-slate-500 text-xs">{t.campus}</TableCell>
+                                  <TableCell className="font-black text-slate-900 text-xs">
+                                    {t.attended} <span className="text-slate-300">/</span> {t.totalEvents}
+                                  </TableCell>
+                                  <TableCell className="pr-6 sm:pr-10">
+                                    <div className="flex items-center gap-4">
+                                      <Progress value={t.rate} className="h-2 bg-slate-100 flex-1" />
+                                      <span className="text-xs font-black text-[#A37FBC] w-8">{t.rate}%</span>
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
                       </CardContent>
                     </Card>
                   </>

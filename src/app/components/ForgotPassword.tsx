@@ -72,148 +72,174 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-[#fafafa] flex items-center justify-center p-6 font-['Geist',sans-serif] relative overflow-hidden">
+      {/* Dynamic Mesh Background */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-40">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `var(--mesh-gradient)`,
+            filter: 'blur(80px)',
+            backgroundSize: '100% 100%',
+          }}
+        />
+      </div>
+
+      <div className="w-full max-w-lg relative z-10">
         <Button
           variant="ghost"
-          className="mb-4"
+          className="mb-8 text-slate-500 hover:text-slate-900 group rounded-full px-6"
           onClick={() => step === 'success' ? navigate(`/login/${role}`) : navigate(-1)}
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          {step === 'success' ? 'Back to Login' : 'Back'}
+          <ArrowLeft className="h-4 w-4 mr-2 transition-transform group-hover:-translate-x-1" />
+          {step === 'success' ? 'Back to Login' : 'Back to Gateway'}
         </Button>
 
-        <Card>
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">
-              Reset Password
-            </CardTitle>
-            <CardDescription className="text-center">
-              {getRoleTitle()} Portal
-            </CardDescription>
+        <Card className="bg-white/50 border-white/50 backdrop-blur-3xl shadow-[0_20px_50px_rgb(0,0,0,0.05)] border-none rounded-[2.5rem] overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-2 bg-[#A37FBC]"></div>
+          <CardHeader className="p-6 sm:p-10 pb-4 sm:pb-6 space-y-4 sm:space-y-6">
+            <div className="flex justify-center">
+              <div className="p-3 sm:p-4 bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-50">
+                <CheckCircle2 className="h-12 w-12 sm:h-16 sm:w-16 text-[#A37FBC]" />
+              </div>
+            </div>
+            <div className="text-center space-y-1 sm:space-y-2">
+              <CardTitle className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">
+                Identity <span className="text-[#A37FBC]">Recovery</span>
+              </CardTitle>
+              <CardDescription className="text-slate-400 font-bold text-[8px] sm:text-[10px] uppercase tracking-[0.2em] sm:tracking-[0.3em]">
+                {getRoleTitle()} Authorization Bypass
+              </CardDescription>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6 sm:p-10 pt-0">
             {step === 'request-otp' && (
-              <form onSubmit={handleRequestOtp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="identifier">Email or Contact Number</Label>
+              <form onSubmit={handleRequestOtp} className="space-y-8">
+                <div className="space-y-3">
+                  <Label htmlFor="identifier" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Identity Vector (Email/Phone)</Label>
                   <Input
                     id="identifier"
                     type="text"
-                    placeholder="e.g. user@ekyaschool.in or 9876543210"
+                    placeholder="e.g. user@growthub.edu"
+                    className="h-14 bg-white/50 border-slate-100 text-slate-900 placeholder:text-slate-200 focus:border-[#A37FBC] focus:ring-0 rounded-2xl transition-all font-bold"
                     value={identifier}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIdentifier(e.target.value)}
                     required
                   />
-                  <p className="text-xs text-gray-500">
-                    We'll send a 6-digit OTP to your registered email or phone.
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider ml-1 italic">
+                    We'll transmit a 6-digit session key to your registered vector.
                   </p>
                 </div>
                 {error && (
-                  <Alert variant="destructive">
+                  <Alert className="bg-rose-50 border-rose-100 text-rose-600 rounded-2xl px-6 py-4">
                     <ShieldAlert className="h-4 w-4" />
-                    <AlertDescription>{error}</AlertDescription>
+                    <AlertDescription className="text-xs font-bold uppercase tracking-tight ml-2">{error}</AlertDescription>
                   </Alert>
                 )}
-                <Button type="submit" className="w-full">
-                  Send OTP
+                <Button type="submit" className="w-full bg-[#A37FBC] hover:bg-[#8e6ba8] h-16 text-sm font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-[#A37FBC]/20 transition-all border-none">
+                  Transmit Key
                 </Button>
               </form>
             )}
 
             {step === 'verify-otp' && (
-              <form onSubmit={handleVerifyOtp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="otp">Enter 6-Digit OTP</Label>
+              <form onSubmit={handleVerifyOtp} className="space-y-8">
+                <div className="space-y-3">
+                  <Label htmlFor="otp" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Session Authorization Key</Label>
                   <Input
                     id="otp"
                     type="text"
                     placeholder="123456"
                     maxLength={6}
+                    className="h-14 bg-white/50 border-slate-100 text-slate-900 placeholder:text-slate-200 focus:border-[#A37FBC] focus:ring-0 rounded-2xl transition-all font-black text-center text-xl tracking-[0.5em]"
                     value={otp}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOtp(e.target.value)}
                     required
                   />
-                  <div className="flex justify-between items-center">
-                    <p className="text-xs text-gray-500">
-                      Sent to: {identifier}
+                  <div className="flex justify-between items-center px-1">
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
+                      Target: {identifier}
                     </p>
                     <button
                       type="button"
-                      className="text-xs text-blue-600 hover:underline"
+                      className="text-[9px] font-black uppercase tracking-widest text-[#A37FBC] hover:underline"
                       onClick={() => setStep('request-otp')}
                     >
-                      Change
+                      Change Vector
                     </button>
                   </div>
                 </div>
                 {error && (
-                  <Alert variant="destructive">
+                  <Alert className="bg-rose-50 border-rose-100 text-rose-600 rounded-2xl px-6 py-4">
                     <ShieldAlert className="h-4 w-4" />
-                    <AlertDescription>{error}</AlertDescription>
+                    <AlertDescription className="text-xs font-bold uppercase tracking-tight ml-2">{error}</AlertDescription>
                   </Alert>
                 )}
-                <Button type="submit" className="w-full">
-                  Verify OTP
+                <Button type="submit" className="w-full bg-[#A37FBC] hover:bg-[#8e6ba8] h-16 text-sm font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-[#A37FBC]/20 transition-all border-none">
+                  Validate Key
                 </Button>
-                <div className="text-center text-xs text-gray-500">
-                  Didn't receive code? <button type="button" className="text-blue-600 hover:underline">Resend OTP</button>
+                <div className="text-center">
+                  <button type="button" className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-[#A37FBC] transition-colors">Retransmit Authorization Key</button>
                 </div>
               </form>
             )}
 
             {step === 'reset-password' && (
-              <form onSubmit={handleResetPassword} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="newPassword">New Password</Label>
+              <form onSubmit={handleResetPassword} className="space-y-6">
+                <div className="space-y-3">
+                  <Label htmlFor="newPassword" title="New Sequence" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">New Security Sequence</Label>
                   <Input
                     id="newPassword"
                     type="password"
-                    placeholder="Enter new password"
+                    placeholder="••••••••"
+                    className="h-14 bg-white/50 border-slate-100 text-slate-900 placeholder:text-slate-200 focus:border-[#A37FBC] focus:ring-0 rounded-2xl transition-all font-bold"
                     value={newPassword}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value)}
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <div className="space-y-3">
+                  <Label htmlFor="confirmPassword" title="Confirm Sequence" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Confirm Security Sequence</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
-                    placeholder="Confirm new password"
+                    placeholder="••••••••"
+                    className="h-14 bg-white/50 border-slate-100 text-slate-900 placeholder:text-slate-200 focus:border-[#A37FBC] focus:ring-0 rounded-2xl transition-all font-bold"
                     value={confirmPassword}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
                     required
                   />
                 </div>
                 {error && (
-                  <Alert variant="destructive">
+                  <Alert className="bg-rose-50 border-rose-100 text-rose-600 rounded-2xl px-6 py-4">
                     <ShieldAlert className="h-4 w-4" />
-                    <AlertDescription>{error}</AlertDescription>
+                    <AlertDescription className="text-xs font-bold uppercase tracking-tight ml-2">{error}</AlertDescription>
                   </Alert>
                 )}
-                <Button type="submit" className="w-full">
-                  Reset Password
+                <Button type="submit" className="w-full bg-[#A37FBC] hover:bg-[#8e6ba8] h-16 text-sm font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-[#A37FBC]/20 transition-all border-none">
+                  Commit Sequence Update
                 </Button>
               </form>
             )}
 
             {step === 'success' && (
-              <div className="text-center space-y-4 py-4">
+              <div className="text-center space-y-8 py-4">
                 <div className="flex justify-center">
-                  <CheckCircle2 className="h-12 w-12 text-green-500" />
+                  <div className="p-8 bg-emerald-50 rounded-full border border-emerald-100">
+                    <CheckCircle2 className="h-12 w-12 text-emerald-500" />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <h3 className="text-xl font-semibold">Password Reset Successful</h3>
-                  <p className="text-sm text-gray-500">
-                    Your password has been updated. You can now log in with your new password.
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Sequence Update Success</h3>
+                  <p className="text-sm font-semibold text-slate-500 leading-relaxed max-w-xs mx-auto">
+                    Your security sequence has been successfully committed to the hub. You may now initialize a new session.
                   </p>
                 </div>
                 <Button
-                  className="w-full"
+                  className="w-full bg-[#A37FBC] hover:bg-[#8e6ba8] h-16 text-sm font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-[#A37FBC]/20 transition-all border-none"
                   onClick={() => navigate(`/login/${role}`)}
                 >
-                  Go to Login
+                  Return to Gateway
                 </Button>
               </div>
             )}

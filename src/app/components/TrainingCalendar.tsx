@@ -16,19 +16,15 @@ export default function TrainingCalendar({ events, onRegister, getTrainingStatus
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedEvent, setSelectedEvent] = useState<TrainingEvent | null>(null);
 
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     const getDaysInMonth = (date: Date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        return new Date(year, month + 1, 0).getDate();
+        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
     };
 
     const getFirstDayOfMonth = (date: Date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        return new Date(year, month, 1).getDay();
+        return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
     };
 
     const previousMonth = () => {
@@ -74,8 +70,8 @@ export default function TrainingCalendar({ events, onRegister, getTrainingStatus
                 <div
                     key={day}
                     className={`aspect-square p-2 rounded-2xl transition-all cursor-pointer group relative ${isCurrentDay
-                            ? 'bg-[#A37FBC]/10 border-2 border-[#A37FBC]'
-                            : 'bg-white/60 hover:bg-white hover:shadow-lg'
+                        ? 'bg-[#A37FBC]/10 border-2 border-[#A37FBC]'
+                        : 'bg-white/60 hover:bg-white hover:shadow-lg'
                         }`}
                 >
                     <div className="flex flex-col h-full">
@@ -88,7 +84,6 @@ export default function TrainingCalendar({ events, onRegister, getTrainingStatus
                         <div className="flex-1 space-y-1 overflow-hidden">
                             {dayEvents.slice(0, 3).map((event, idx) => {
                                 const isEventDate = event.date === `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                                const status = getTrainingStatus(event.id);
 
                                 return (
                                     <div
@@ -137,80 +132,88 @@ export default function TrainingCalendar({ events, onRegister, getTrainingStatus
 
     return (
         <>
-            <Card className="bg-white/60 backdrop-blur-md border-none rounded-[3rem] shadow-sm overflow-hidden">
-                <CardHeader className="p-8 border-b border-black/[0.02]">
-                    <div className="flex justify-between items-center">
-                        <div>
-                            <CardTitle className="text-2xl font-black text-slate-900 uppercase tracking-tight">
-                                {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-                            </CardTitle>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                                Training Schedule Calendar
-                            </p>
+            <Card className="bg-white/60 backdrop-blur-3xl border-none rounded-[2.5rem] sm:rounded-[4rem] shadow-sm overflow-hidden flex flex-col h-full border border-black/[0.02]">
+                <CardHeader className="p-6 sm:p-12 border-b border-black/[0.02]">
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
+                        <div className="flex items-center gap-4 group cursor-pointer">
+                            <div className="p-4 bg-white rounded-3xl shadow-sm border border-slate-50 transition-all group-hover:scale-110">
+                                <CalendarIcon className="h-6 w-6 sm:h-8 sm:w-8 text-[#A37FBC]" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl sm:text-3xl font-black text-slate-900 uppercase tracking-tighter">
+                                    {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+                                </h2>
+                                <p className="text-[10px] font-black text-[#A37FBC] uppercase tracking-[0.4em] opacity-70">
+                                    Global Academic Ledger
+                                </p>
+                            </div>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex bg-white/60 p-2 rounded-2xl border border-slate-100 shadow-sm">
                             <Button
                                 variant="ghost"
                                 size="icon"
                                 onClick={previousMonth}
-                                className="h-10 w-10 rounded-xl bg-white/50 hover:bg-white border border-slate-100"
+                                className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl hover:bg-slate-50 text-slate-400 hover:text-[#A37FBC] transition-all"
                             >
-                                <ChevronLeft className="h-4 w-4 text-slate-600" />
+                                <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
                             </Button>
+                            <div className="w-[1px] h-6 sm:h-8 bg-slate-100 self-center mx-1"></div>
                             <Button
                                 variant="ghost"
                                 size="icon"
                                 onClick={nextMonth}
-                                className="h-10 w-10 rounded-xl bg-white/50 hover:bg-white border border-slate-100"
+                                className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl hover:bg-slate-50 text-slate-400 hover:text-[#A37FBC] transition-all"
                             >
-                                <ChevronRight className="h-4 w-4 text-slate-600" />
+                                <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
                             </Button>
                         </div>
                     </div>
                 </CardHeader>
-                <CardContent className="p-8">
-                    {/* Day headers */}
-                    <div className="grid grid-cols-7 gap-2 mb-4">
-                        {dayNames.map((day) => (
-                            <div
-                                key={day}
-                                className="text-center text-[10px] font-black text-slate-400 uppercase tracking-widest py-2"
-                            >
-                                {day}
-                            </div>
-                        ))}
-                    </div>
+                <CardContent className="p-0 flex-1 overflow-x-auto">
+                    <div className="min-w-[800px] p-6 sm:p-12">
+                        {/* Day headers */}
+                        <div className="grid grid-cols-7 gap-6 mb-8">
+                            {dayNames.map((day) => (
+                                <div
+                                    key={day}
+                                    className="text-center text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-[0.3em] py-2"
+                                >
+                                    {day}
+                                </div>
+                            ))}
+                        </div>
 
-                    {/* Calendar grid */}
-                    <div className="grid grid-cols-7 gap-2">
-                        {renderCalendarDays()}
-                    </div>
+                        {/* Calendar grid */}
+                        <div className="grid grid-cols-7 gap-3 sm:gap-6">
+                            {renderCalendarDays()}
+                        </div>
 
-                    {/* Legend */}
-                    <div className="mt-8 pt-6 border-t border-black/[0.02]">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
-                            Course Categories
-                        </p>
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#A37FBC' }} />
-                                <span className="text-[9px] font-bold text-slate-600 uppercase tracking-tight">Technology</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#3B82F6' }} />
-                                <span className="text-[9px] font-bold text-slate-600 uppercase tracking-tight">Pedagogy</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10B981' }} />
-                                <span className="text-[9px] font-bold text-slate-600 uppercase tracking-tight">Assessment</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F59E0B' }} />
-                                <span className="text-[9px] font-bold text-slate-600 uppercase tracking-tight">Prof. Dev</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F43F5E' }} />
-                                <span className="text-[9px] font-bold text-slate-600 uppercase tracking-tight">Subject Specific</span>
+                        {/* Legend */}
+                        <div className="mt-8 pt-6 border-t border-black/[0.02]">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">
+                                Course Categories
+                            </p>
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#A37FBC' }} />
+                                    <span className="text-[9px] font-bold text-slate-600 uppercase tracking-tight">Technology</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#3B82F6' }} />
+                                    <span className="text-[9px] font-bold text-slate-600 uppercase tracking-tight">Pedagogy</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10B981' }} />
+                                    <span className="text-[9px] font-bold text-slate-600 uppercase tracking-tight">Assessment</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F59E0B' }} />
+                                    <span className="text-[9px] font-bold text-slate-600 uppercase tracking-tight">Prof. Dev</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F43F5E' }} />
+                                    <span className="text-[9px] font-bold text-slate-600 uppercase tracking-tight">Subject Specific</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -219,17 +222,17 @@ export default function TrainingCalendar({ events, onRegister, getTrainingStatus
 
             {/* Event Details Dialog */}
             <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
-                <DialogContent className="max-w-2xl bg-white/95 backdrop-blur-3xl border-none rounded-[3rem] shadow-2xl p-12">
+                <DialogContent className="max-w-2xl w-[95vw] bg-white/95 backdrop-blur-3xl border-none rounded-[2.5rem] sm:rounded-[3rem] shadow-2xl p-6 sm:p-12 overflow-y-auto max-h-[90vh]">
                     {selectedEvent && (
                         <>
                             <div
-                                className="absolute top-0 left-0 w-full h-2 rounded-t-[3rem]"
+                                className="absolute top-0 left-0 w-full h-2 rounded-t-[2.5rem] sm:rounded-t-[3rem]"
                                 style={{ backgroundColor: selectedEvent.color }}
                             />
                             <DialogHeader className="mb-8">
-                                <div className="flex items-start justify-between">
+                                <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                                     <div className="flex-1">
-                                        <DialogTitle className="text-3xl font-black text-slate-900 uppercase tracking-tight mb-2">
+                                        <DialogTitle className="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-tight mb-2">
                                             {selectedEvent.title}
                                         </DialogTitle>
                                         <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: selectedEvent.color }}>
@@ -249,7 +252,7 @@ export default function TrainingCalendar({ events, onRegister, getTrainingStatus
                             </DialogHeader>
 
                             <div className="space-y-6">
-                                <div className="grid grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                                     <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
                                         <div className="flex items-center gap-3 mb-2">
                                             <CalendarIcon className="h-4 w-4" style={{ color: selectedEvent.color }} />
@@ -296,7 +299,7 @@ export default function TrainingCalendar({ events, onRegister, getTrainingStatus
                                             onRegister(selectedEvent);
                                             setSelectedEvent(null);
                                         }}
-                                        className="w-full h-14 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl border-none"
+                                        className="w-full h-14 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl border-none mt-4"
                                         style={{
                                             backgroundColor: selectedEvent.color,
                                             color: 'white',

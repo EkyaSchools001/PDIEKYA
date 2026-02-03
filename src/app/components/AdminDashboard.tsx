@@ -75,7 +75,7 @@ export default function AdminDashboard() {
   const [editingImg, setEditingImg] = useState<any>(null);
   const [isEditImgOpen, setIsEditImgOpen] = useState(false);
   const [isAddImgOpen, setIsAddImgOpen] = useState(false);
-  const [newImgForm, setNewImgForm] = useState({ url: '', cap: '' });
+  const [newImgForm, setNewImgForm] = useState({ url: '', cap: '', duration: 30 });
 
   // Training State
   const [newTraining, setNewTraining] = useState({
@@ -205,10 +205,31 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert('File size exceeds 2MB limit.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewImgForm(prev => ({ ...prev, url: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleUpdateGalleryImage = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingImg) {
-      updateGalleryImage(editingImg.id, editingImg);
+      let updates = { ...editingImg };
+      if (updates.duration && updates.duration > 0) {
+        const date = new Date();
+        date.setDate(date.getDate() + updates.duration);
+        updates.expiryDate = date.toISOString();
+      }
+      updateGalleryImage(editingImg.id, updates);
       setIsEditImgOpen(false);
       setEditingImg(null);
     }
@@ -216,9 +237,24 @@ export default function AdminDashboard() {
 
   const handleAddGalleryImage = (e: React.FormEvent) => {
     e.preventDefault();
-    addGalleryImage(newImgForm);
+    if (!newImgForm.url) {
+      alert('Please provide an image URL or upload a file.');
+      return;
+    }
+
+    let expiryDate = undefined;
+    if (newImgForm.duration && newImgForm.duration > 0) {
+      const date = new Date();
+      date.setDate(date.getDate() + newImgForm.duration);
+      expiryDate = date.toISOString();
+    }
+
+    addGalleryImage({
+      ...newImgForm,
+      expiryDate
+    });
     setIsAddImgOpen(false);
-    setNewImgForm({ url: '', cap: '' });
+    setNewImgForm({ url: '', cap: '', duration: 30 });
   };
 
   const handleAddTraining = (e: React.FormEvent) => {
@@ -336,6 +372,19 @@ export default function AdminDashboard() {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
+        {/* Mobile Header */}
+        <div className="lg:hidden bg-white/70 backdrop-blur-md border-b border-black/[0.03] px-6 py-4 flex justify-between items-center sticky top-0 z-30">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-white rounded-xl shadow-sm border border-slate-50">
+              <img src="/logo.png" alt="Ekya School" className="h-8 w-8 object-contain" />
+            </div>
+            <h2 className="text-xs font-black text-[#A37FBC] uppercase tracking-[0.3em]">Admin Central</h2>
+          </div>
+          <Button variant="ghost" size="icon" onClick={handleLogout} className="rounded-full">
+            <LogOut className="h-5 w-5 text-slate-400" />
+          </Button>
+        </div>
+
         {/* Desktop Header */}
         <header className="bg-white/40 backdrop-blur-md border-b border-black/[0.03] hidden lg:block px-12 py-8">
           <div className="flex justify-between items-center">
@@ -512,48 +561,50 @@ export default function AdminDashboard() {
                         </DialogContent>
                       </Dialog>
                     </CardHeader>
-                    <CardContent className="p-0">
-                      <Table>
-                        <TableHeader className="bg-slate-50/50">
-                          <TableRow className="border-b border-black/[0.03]">
-                            <TableHead className="pl-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">Date</TableHead>
-                            <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Classification</TableHead>
-                            <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Title</TableHead>
-                            <TableHead className="text-right pr-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">Control</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {announcements.map((ann) => (
-                            <TableRow key={ann.id} className="border-b border-black/[0.01] hover:bg-[#A37FBC]/[0.02] transition-colors group">
-                              <TableCell className="pl-10 font-bold text-slate-400 text-[11px] uppercase tracking-tighter">
-                                {new Date(ann.date).toLocaleDateString()}
-                              </TableCell>
-                              <TableCell>
-                                <Badge className="bg-[#A37FBC]/10 text-[#A37FBC] border-none rounded-full px-4 text-[9px] font-black uppercase tracking-widest">
-                                  {ann.type}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="font-black text-slate-900 tracking-tight">{ann.title}</TableCell>
-                              <TableCell className="text-right pr-10">
-                                <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <Button
-                                    size="sm" variant="ghost" className="rounded-xl hover:bg-white hover:text-[#A37FBC] shadow-sm"
-                                    onClick={() => { setEditingAnn(ann); setIsEditAnnOpen(true); }}
-                                  >
-                                    <Edit className="h-4 w-4" />
-                                  </Button>
-                                  <Button
-                                    size="sm" variant="ghost" className="rounded-xl hover:bg-rose-50 hover:text-rose-600 shadow-sm"
-                                    onClick={() => deleteAnnouncement(ann.id)}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              </TableCell>
+                    <CardContent className="p-0 overflow-x-auto">
+                      <div className="min-w-[600px]">
+                        <Table>
+                          <TableHeader className="bg-slate-50/50">
+                            <TableRow className="border-b border-black/[0.03]">
+                              <TableHead className="pl-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">Date</TableHead>
+                              <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Classification</TableHead>
+                              <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Title</TableHead>
+                              <TableHead className="text-right pr-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">Control</TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                          </TableHeader>
+                          <TableBody>
+                            {announcements.map((ann) => (
+                              <TableRow key={ann.id} className="border-b border-black/[0.01] hover:bg-[#A37FBC]/[0.02] transition-colors group">
+                                <TableCell className="pl-10 font-bold text-slate-400 text-[11px] uppercase tracking-tighter">
+                                  {new Date(ann.date).toLocaleDateString()}
+                                </TableCell>
+                                <TableCell>
+                                  <Badge className="bg-[#A37FBC]/10 text-[#A37FBC] border-none rounded-full px-4 text-[9px] font-black uppercase tracking-widest">
+                                    {ann.type}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="font-black text-slate-900 tracking-tight">{ann.title}</TableCell>
+                                <TableCell className="text-right pr-10">
+                                  <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button
+                                      size="sm" variant="ghost" className="rounded-xl hover:bg-white hover:text-[#A37FBC] shadow-sm"
+                                      onClick={() => { setEditingAnn(ann); setIsEditAnnOpen(true); }}
+                                    >
+                                      <Edit className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      size="sm" variant="ghost" className="rounded-xl hover:bg-rose-50 hover:text-rose-600 shadow-sm"
+                                      onClick={() => deleteAnnouncement(ann.id)}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
                     </CardContent>
                   </Card>
                 ) : (
@@ -670,8 +721,21 @@ export default function AdminDashboard() {
                             <Type className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
                             <Input
                               className="h-14 pl-12 bg-white/50 border-slate-100 rounded-2xl font-bold"
-                              value={editingImg.cap}
+                              value={editingImg.cap || ''}
                               onChange={e => setEditingImg({ ...editingImg, cap: e.target.value })}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Display Duration (Days)</Label>
+                          <div className="relative">
+                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                            <Input
+                              type="number"
+                              min="1"
+                              className="h-14 pl-12 bg-white/50 border-slate-100 rounded-2xl font-bold"
+                              value={editingImg.duration || 30}
+                              onChange={e => setEditingImg({ ...editingImg, duration: parseInt(e.target.value) || 30 })}
                             />
                           </div>
                         </div>
@@ -687,8 +751,37 @@ export default function AdminDashboard() {
                       <DialogTitle className="text-3xl font-black text-slate-900 uppercase tracking-tight">New Asset Registry</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleAddGalleryImage} className="space-y-6">
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Image Endpoint (URL)</Label>
+                      <div className="space-y-4">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Image Source</Label>
+
+                        {/* File Upload Area */}
+                        <div
+                          className="border-2 border-dashed border-slate-100 rounded-2xl p-8 flex flex-col items-center justify-center hover:bg-slate-50 transition-all cursor-pointer group relative overflow-hidden"
+                          onClick={() => document.getElementById('image-upload')?.click()}
+                        >
+                          {newImgForm.url ? (
+                            <img src={newImgForm.url} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
+                          ) : (
+                            <>
+                              <PlusCircle className="h-8 w-8 text-slate-300 mb-2 group-hover:text-[#A37FBC] group-hover:scale-110 transition-all" />
+                              <span className="text-[10px] font-black uppercase text-slate-400 group-hover:text-[#A37FBC]">Upload Local File</span>
+                            </>
+                          )}
+                          <input
+                            id="image-upload"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleFileChange}
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          <div className="h-[1px] bg-slate-100 flex-1"></div>
+                          <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">or use URL</span>
+                          <div className="h-[1px] bg-slate-100 flex-1"></div>
+                        </div>
+
                         <div className="relative">
                           <IconLink className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
                           <Input
@@ -696,20 +789,33 @@ export default function AdminDashboard() {
                             className="h-14 pl-12 bg-white/50 border-slate-100 rounded-2xl font-bold"
                             value={newImgForm.url}
                             onChange={e => setNewImgForm({ ...newImgForm, url: e.target.value })}
-                            required
                           />
                         </div>
                       </div>
+
                       <div className="space-y-2">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Descriptive Caption</Label>
                         <div className="relative">
                           <Type className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
                           <Input
-                            placeholder="Collaborative Study"
+                            placeholder="Collaborative Study (Optional)"
                             className="h-14 pl-12 bg-white/50 border-slate-100 rounded-2xl font-bold"
                             value={newImgForm.cap}
                             onChange={e => setNewImgForm({ ...newImgForm, cap: e.target.value })}
-                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Display Duration (Days)</Label>
+                        <div className="relative">
+                          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                          <Input
+                            type="number"
+                            min="1"
+                            placeholder="Default: 30"
+                            className="h-14 pl-12 bg-white/50 border-slate-100 rounded-2xl font-bold"
+                            value={newImgForm.duration}
+                            onChange={e => setNewImgForm({ ...newImgForm, duration: parseInt(e.target.value) || 30 })}
                           />
                         </div>
                       </div>
@@ -769,46 +875,48 @@ export default function AdminDashboard() {
                   </div>
                 </CardHeader>
                 <CardContent className="p-0 overflow-x-auto">
-                  <Table>
-                    <TableHeader className="bg-slate-50/50">
-                      <TableRow className="border-b border-black/[0.03]">
-                        <TableHead className="w-20 pl-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">SEQ</TableHead>
-                        <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">UID</TableHead>
-                        <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Entity Name</TableHead>
-                        <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Role</TableHead>
-                        <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Network Identity</TableHead>
-                        <TableHead className="text-right pr-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">Operations</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredUsers.map((user) => (
-                        <TableRow key={user.empId} className="border-b border-black/[0.01] hover:bg-[#A37FBC]/[0.02] transition-colors group">
-                          <TableCell className="pl-10 font-black text-slate-300 text-[11px]">{user.sNo}</TableCell>
-                          <TableCell className="font-mono text-[11px] font-bold text-[#A37FBC] uppercase">{user.empId}</TableCell>
-                          <TableCell className="font-black text-slate-900 tracking-tight">{user.name}</TableCell>
-                          <TableCell>
-                            <Badge className="bg-[#A37FBC]/10 text-[#A37FBC] border-none rounded-full px-4 text-[9px] font-black uppercase tracking-widest">
-                              {user.designation}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="font-bold text-slate-500 text-xs">{user.campus}</TableCell>
-                          <TableCell className="text-right pr-10">
-                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button
-                                size="sm" variant="ghost" className="rounded-xl hover:bg-[#A37FBC]/10 hover:text-[#A37FBC] shadow-sm flex items-center gap-2 px-3"
-                                onClick={() => navigate(`/admin/vector/${user.empId}`)}
-                              >
-                                <TrendingUp className="h-3.5 w-3.5" />
-                                <span className="text-[10px] font-black uppercase tracking-widest">Growth Vector</span>
-                              </Button>
-                              <Button size="sm" variant="ghost" className="rounded-xl hover:bg-white hover:text-[#A37FBC] shadow-sm"><Edit className="h-4 w-4" /></Button>
-                              <Button size="sm" variant="ghost" className="rounded-xl hover:bg-rose-50 hover:text-rose-600 shadow-sm" onClick={() => handleDeleteUser(user.empId)}><Trash2 className="h-4 w-4" /></Button>
-                            </div>
-                          </TableCell>
+                  <div className="min-w-[800px]">
+                    <Table>
+                      <TableHeader className="bg-slate-50/50">
+                        <TableRow className="border-b border-black/[0.03]">
+                          <TableHead className="w-20 pl-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">SEQ</TableHead>
+                          <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">UID</TableHead>
+                          <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Entity Name</TableHead>
+                          <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Role</TableHead>
+                          <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Network Identity</TableHead>
+                          <TableHead className="text-right pr-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">Operations</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredUsers.map((user) => (
+                          <TableRow key={user.empId} className="border-b border-black/[0.01] hover:bg-[#A37FBC]/[0.02] transition-colors group">
+                            <TableCell className="pl-10 font-black text-slate-300 text-[11px]">{user.sNo}</TableCell>
+                            <TableCell className="font-mono text-[11px] font-bold text-[#A37FBC] uppercase">{user.empId}</TableCell>
+                            <TableCell className="font-black text-slate-900 tracking-tight">{user.name}</TableCell>
+                            <TableCell>
+                              <Badge className="bg-[#A37FBC]/10 text-[#A37FBC] border-none rounded-full px-4 text-[9px] font-black uppercase tracking-widest">
+                                {user.designation}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="font-bold text-slate-500 text-xs">{user.campus}</TableCell>
+                            <TableCell className="text-right pr-10">
+                              <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button
+                                  size="sm" variant="ghost" className="rounded-xl hover:bg-[#A37FBC]/10 hover:text-[#A37FBC] shadow-sm flex items-center gap-2 px-3"
+                                  onClick={() => navigate(`/admin/vector/${user.empId}`)}
+                                >
+                                  <TrendingUp className="h-3.5 w-3.5" />
+                                  <span className="text-[10px] font-black uppercase tracking-widest">Growth Vector</span>
+                                </Button>
+                                <Button size="sm" variant="ghost" className="rounded-xl hover:bg-white hover:text-[#A37FBC] shadow-sm"><Edit className="h-4 w-4" /></Button>
+                                <Button size="sm" variant="ghost" className="rounded-xl hover:bg-rose-50 hover:text-rose-600 shadow-sm" onClick={() => handleDeleteUser(user.empId)}><Trash2 className="h-4 w-4" /></Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </CardContent>
               </Card>
             )}
@@ -960,59 +1068,61 @@ export default function AdminDashboard() {
                       </DialogContent>
                     </Dialog>
                   </CardHeader>
-                  <CardContent className="p-0">
-                    <Table>
-                      <TableHeader className="bg-slate-50/50">
-                        <TableRow className="border-b border-black/[0.03]">
-                          <TableHead className="pl-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">Date</TableHead>
-                          <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Event Details</TableHead>
-                          <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Campus</TableHead>
-                          <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Status</TableHead>
-                          <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Enrollment</TableHead>
-                          <TableHead className="text-right pr-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {getTrainingEvents().map((event) => (
-                          <TableRow key={event.id} className="border-b border-black/[0.01] hover:bg-[#A37FBC]/[0.02] transition-colors group">
-                            <TableCell className="pl-10 font-bold text-slate-400 text-[11px] uppercase tracking-tighter">
-                              {new Date(event.date).toLocaleDateString()}
-                              <div className="text-[9px] text-[#A37FBC] mt-0.5">{event.time}</div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="font-black text-slate-900 tracking-tight">{event.title}</div>
-                              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-0.5">{event.topic}</div>
-                            </TableCell>
-                            <TableCell className="font-bold text-slate-500 text-xs">{event.campus}</TableCell>
-                            <TableCell>
-                              <Badge className={`border-none rounded-full px-4 text-[9px] font-black uppercase tracking-widest ${event.status === 'Open' ? 'bg-[#A37FBC]/10 text-[#A37FBC]' : 'bg-slate-100 text-slate-400'
-                                }`}>
-                                {event.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="font-black text-slate-900 text-xs">
-                              {event.enrolled} <span className="text-slate-300">/</span> {event.capacity}
-                            </TableCell>
-                            <TableCell className="text-right pr-10">
-                              <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Button
-                                  size="sm" variant="ghost" className="rounded-xl hover:bg-white hover:text-[#A37FBC] shadow-sm"
-                                  onClick={() => { setEditingTraining(event); setIsEditTrainingOpen(true); }}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  size="sm" variant="ghost" className="rounded-xl hover:bg-rose-50 hover:text-rose-600 shadow-sm"
-                                  onClick={() => handleDeleteTraining(event.id)}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
+                  <CardContent className="p-0 overflow-x-auto">
+                    <div className="min-w-[800px]">
+                      <Table>
+                        <TableHeader className="bg-slate-50/50">
+                          <TableRow className="border-b border-black/[0.03]">
+                            <TableHead className="pl-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">Date</TableHead>
+                            <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Event Details</TableHead>
+                            <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Campus</TableHead>
+                            <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Status</TableHead>
+                            <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Enrollment</TableHead>
+                            <TableHead className="text-right pr-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">Actions</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {getTrainingEvents().map((event) => (
+                            <TableRow key={event.id} className="border-b border-black/[0.01] hover:bg-[#A37FBC]/[0.02] transition-colors group">
+                              <TableCell className="pl-10 font-bold text-slate-400 text-[11px] uppercase tracking-tighter">
+                                {new Date(event.date).toLocaleDateString()}
+                                <div className="text-[9px] text-[#A37FBC] mt-0.5">{event.time}</div>
+                              </TableCell>
+                              <TableCell>
+                                <div className="font-black text-slate-900 tracking-tight">{event.title}</div>
+                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-0.5">{event.topic}</div>
+                              </TableCell>
+                              <TableCell className="font-bold text-slate-500 text-xs">{event.campus}</TableCell>
+                              <TableCell>
+                                <Badge className={`border-none rounded-full px-4 text-[9px] font-black uppercase tracking-widest ${event.status === 'Open' ? 'bg-[#A37FBC]/10 text-[#A37FBC]' : 'bg-slate-100 text-slate-400'
+                                  }`}>
+                                  {event.status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="font-black text-slate-900 text-xs">
+                                {event.enrolled} <span className="text-slate-300">/</span> {event.capacity}
+                              </TableCell>
+                              <TableCell className="text-right pr-10">
+                                <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <Button
+                                    size="sm" variant="ghost" className="rounded-xl hover:bg-white hover:text-[#A37FBC] shadow-sm"
+                                    onClick={() => { setEditingTraining(event); setIsEditTrainingOpen(true); }}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    size="sm" variant="ghost" className="rounded-xl hover:bg-rose-50 hover:text-rose-600 shadow-sm"
+                                    onClick={() => handleDeleteTraining(event.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </CardContent>
                 </Card>
 

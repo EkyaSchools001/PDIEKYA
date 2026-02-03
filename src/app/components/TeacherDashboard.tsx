@@ -7,7 +7,7 @@ import { Badge } from '@/app/components/ui/badge';
 import { Progress } from '@/app/components/ui/progress';
 import { ScrollArea } from '@/app/components/ui/scroll-area';
 import { Textarea } from '@/app/components/ui/textarea';
-import { LogOut, BookOpen, Calendar, Target, MessageSquare, CheckCircle, LucideIcon, ChevronRight, ArrowLeft, CheckCircle2, ShieldCheck, Clock, UserCheck, LayoutGrid, ArrowRight } from 'lucide-react';
+import { LogOut, BookOpen, Calendar, Target, MessageSquare, CheckCircle, LucideIcon, ChevronRight, ArrowLeft, CheckCircle2, ShieldCheck, Clock, UserCheck, LayoutGrid, ArrowRight, Zap, Activity } from 'lucide-react';
 import { Separator } from '@/app/components/ui/separator';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/app/components/ui/dialog';
 import { Users, ClipboardCheck, FileText } from 'lucide-react';
@@ -219,11 +219,38 @@ export default function TeacherDashboard() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
         {/* Mobile Header */}
-        <div className="md:hidden bg-white/70 backdrop-blur-md border-b border-black/[0.03] px-6 py-4 flex justify-between items-center sticky top-0 z-30">
-          <h2 className="text-sm font-black text-[#A37FBC] uppercase tracking-[0.3em]">Growth Hub</h2>
-          <Button variant="ghost" size="icon" onClick={handleLogout} className="rounded-full">
-            <LogOut className="h-5 w-5 text-slate-400" />
-          </Button>
+        <div className="md:hidden bg-white/70 backdrop-blur-md border-b border-black/[0.03] p-4 flex justify-between items-center sticky top-0 z-30">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-white rounded-xl shadow-sm border border-slate-50">
+              <img
+                src="/logo.png"
+                alt="Ekya School PDI"
+                className="h-8 w-8 object-contain brightness-110"
+              />
+            </div>
+            <div>
+              <h2 className="text-xs font-black text-slate-900 uppercase tracking-tighter">Teacher <span className="text-[#A37FBC]">Central</span></h2>
+              <p className="text-[7px] text-slate-400 font-black tracking-[0.2em] uppercase opacity-70">Growth Telemety</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setActiveView('profile')}
+              className="h-9 w-9 rounded-xl bg-white border border-slate-100 shadow-sm text-slate-400 hover:text-[#A37FBC]"
+            >
+              <Users className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleLogout}
+              className="h-9 w-9 rounded-xl bg-rose-50 border border-rose-100 text-rose-400 hover:text-rose-600 shadow-sm"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         {/* Desktop Header */}
@@ -842,118 +869,209 @@ export default function TeacherDashboard() {
           </DialogContent>
         </Dialog>
 
-        {/* Pedagogy Dossier Dialog */}
+        {/* Pedagogy Dossier Dialog (v3.3 Full Responsive) */}
         <Dialog open={dossierDialogOpen} onOpenChange={setDossierDialogOpen}>
-          <DialogContent className="max-w-3xl bg-white/95 backdrop-blur-3xl border-none rounded-[3.5rem] shadow-2xl p-0 overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-[#A37FBC] to-indigo-500"></div>
+          <DialogContent className="w-[95vw] sm:w-[90vw] md:w-[85vw] max-w-6xl bg-white/20 backdrop-blur-[40px] border border-white/30 rounded-[2rem] sm:rounded-[3rem] shadow-[0_32px_128px_-16px_rgba(0,0,0,0.1)] p-0 overflow-y-auto max-h-[95vh] group/dossier">
+            {/* Visual Accents */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#A37FBC]/20 to-blue-500/10 rounded-full -mr-48 -mt-48 blur-[80px] group-hover/dossier:scale-110 transition-transform duration-1000"></div>
+            <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-emerald-500/5 to-[#A37FBC]/15 rounded-full -ml-36 -mb-36 blur-[60px] group-hover/dossier:scale-110 transition-transform duration-1000"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
 
-            <div className="p-12 space-y-10">
-              <DialogHeader>
+            <div className="relative z-10">
+              {/* Identity Ribbon / Header */}
+              <div className="p-6 sm:p-10 pb-4">
                 <div className="flex justify-between items-start">
-                  <div className="space-y-3 text-left">
-                    <div className="flex items-center gap-3 mb-1">
-                      <span className="w-10 h-[2px] bg-[#A37FBC] rounded-full"></span>
-                      <p className="text-[10px] font-black text-[#A37FBC] uppercase tracking-[0.4em]">Personal Pedagogical Asset</p>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-white/80 rounded-xl shadow-sm border border-white/50">
+                        <ShieldCheck className="h-5 w-5 text-[#A37FBC]" />
+                      </div>
+                      <div className="flex flex-col">
+                        <p className="text-[10px] font-black text-[#A37FBC] uppercase tracking-[0.4em] mb-0.5">Asset Classification</p>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none italic">Verified Pedagogical Record</p>
+                      </div>
                     </div>
-                    <DialogTitle className="text-4xl font-black text-slate-900 uppercase tracking-tight">Professional Dossier</DialogTitle>
+                    <DialogTitle className="text-3xl sm:text-5xl font-black text-slate-900 uppercase tracking-tighter leading-none pt-2">
+                      Professional <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-[#A37FBC] to-slate-900 bg-[length:200%_auto] animate-gradient">Dossier</span>
+                    </DialogTitle>
                   </div>
-                  <Badge
-                    className={`rounded-2xl px-6 py-2 text-[10px] font-black uppercase tracking-widest border-none shadow-xl ${selectedObservationForDossier?.status === 'Reflected' ? 'bg-emerald-500/10 text-emerald-600' :
-                      selectedObservationForDossier?.status === 'Acknowledged' ? 'bg-blue-500/10 text-blue-600' :
-                        'bg-amber-500/10 text-amber-600'
-                      }`}
-                  >
-                    {selectedObservationForDossier?.status}
-                  </Badge>
-                </div>
-              </DialogHeader>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div className="space-y-8 text-left">
-                  <div className="p-8 bg-slate-50/50 rounded-[2.5rem] border border-slate-100 shadow-inner">
-                    <div className="flex items-center gap-5 mb-6">
-                      <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-[#A37FBC] font-black border border-slate-100 shadow-sm">
-                        <Users className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Assessed Identity</p>
-                        <h5 className="text-xl font-black text-slate-900 uppercase tracking-tight">{currentUser.name}</h5>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-4 text-xs font-bold text-slate-500 uppercase tracking-wide">
-                        <ClipboardCheck className="h-4 w-4 text-[#A37FBC]" />
-                        <span>{selectedObservationForDossier?.domain}</span>
-                      </div>
-                      <div className="flex items-center gap-4 text-xs font-bold text-slate-500 uppercase tracking-wide">
-                        <FileText className="h-4 w-4 text-[#A37FBC]" />
-                        <span>Recorded: {selectedObservationForDossier?.date}</span>
-                      </div>
-                      <div className="flex items-center gap-4 text-xs font-bold text-slate-500 uppercase tracking-wide">
-                        <UserCheck className="h-4 w-4 text-[#A37FBC]" />
-                        <span>Observer: {selectedObservationForDossier?.observerName} ({selectedObservationForDossier?.tags[1] || 'Executive'})</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-8 bg-white rounded-[2.5rem] border border-slate-100 shadow-xl flex items-center justify-between">
-                    <div className="text-left">
-                      <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-2">Precision Metric</p>
-                      <p className="text-5xl font-black text-slate-900 tracking-tighter">
-                        {selectedObservationForDossier?.score}
-                        <span className="text-xl text-slate-300 ml-2">/ 5.0</span>
-                      </p>
-                    </div>
-                    <div className="w-20 h-20 rounded-full border-8 border-slate-50 flex items-center justify-center relative">
-                      <svg className="w-full h-full -rotate-90 origin-center overflow-visible">
-                        <circle
-                          cx="40"
-                          cy="40"
-                          r="36"
-                          fill="none"
-                          stroke="#A37FBC"
-                          strokeWidth="8"
-                          strokeDasharray={`${(selectedObservationForDossier?.score / 5) * 226} 226`}
-                          strokeLinecap="round"
-                          className="transition-all duration-1000"
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-2 h-2 rounded-full bg-[#A37FBC] animate-pulse"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col h-full bg-slate-900 rounded-[3rem] p-10 text-white relative overflow-hidden group/feedback shadow-2xl">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#A37FBC]/10 rounded-full blur-[60px] group-hover/feedback:bg-[#A37FBC]/20 transition-all duration-700"></div>
-                  <div className="relative z-10 flex flex-col h-full text-left">
-                    <div className="flex items-center gap-3 mb-8">
-                      <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
-                        <FileText className="h-4 w-4 text-[#A37FBC]" />
-                      </div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Tactical Insights</p>
-                    </div>
-                    <ScrollArea className="flex-1 pr-4">
-                      <p className="text-base font-medium leading-relaxed italic text-slate-200">
-                        "{selectedObservationForDossier?.feedback}"
-                      </p>
-                    </ScrollArea>
-                    <div className="pt-8 mt-auto border-t border-white/5">
-                      <p className="text-[9px] font-black text-[#A37FBC] uppercase tracking-[0.4em]">End of Record</p>
+                  <div className="flex flex-col items-end gap-3 text-right">
+                    <Badge
+                      className={`rounded-2xl px-6 py-2 text-[10px] font-black uppercase tracking-widest border border-white/50 shadow-xl backdrop-blur-md ${selectedObservationForDossier?.status === 'Reflected' ? 'bg-emerald-500/80 text-white' :
+                        selectedObservationForDossier?.status === 'Acknowledged' ? 'bg-blue-500/80 text-white' :
+                          'bg-amber-500/80 text-white'
+                        }`}
+                    >
+                      {selectedObservationForDossier?.status}
+                    </Badge>
+                    <div className="px-5 py-2.5 bg-white/40 rounded-2xl border border-white/40 shadow-sm backdrop-blur-md">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Record ID</p>
+                      <p className="text-[11px] font-black text-slate-900 tracking-tighter">{selectedObservationForDossier?.id}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-end pt-4">
-                <Button
-                  onClick={() => setDossierDialogOpen(false)}
-                  className="bg-slate-900 hover:bg-black text-white px-12 h-16 rounded-[2rem] text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-slate-200"
-                >
-                  Dismiss Record
-                </Button>
+              <div className="px-6 sm:px-10 pb-10">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                  {/* Left Column: Metadata & Precision Gauge */}
+                  <div className="lg:col-span-5 space-y-8">
+                    {/* User Info & Session Label */}
+                    <div className="p-8 bg-white/40 backdrop-blur-md rounded-[2.5rem] border border-white/40 shadow-sm relative overflow-hidden group/meta">
+                      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover/meta:opacity-20 transition-opacity">
+                        <Activity className="h-12 w-12 text-[#A37FBC]" />
+                      </div>
+
+                      <div className="flex items-center gap-6 mb-8 relative z-10">
+                        <div className="w-16 h-16 rounded-2xl bg-[#A37FBC] flex items-center justify-center text-white font-black text-2xl shadow-xl shadow-[#A37FBC]/20">
+                          {currentUser.name[0]}
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-[#A37FBC] font-black uppercase tracking-widest mb-1">Teacher Identity</p>
+                          <h5 className="text-2xl font-black text-slate-900 uppercase tracking-tight">{currentUser.name}</h5>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 relative z-10">
+                        <div className="flex items-center gap-4 bg-white/50 p-3 sm:p-4 rounded-2xl border border-white/40 hover:bg-white/70 transition-all">
+                          <div className="p-2 bg-white rounded-lg shadow-sm">
+                            <Zap className="h-3.5 w-3.5 text-[#A37FBC]" />
+                          </div>
+                          <div>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Growth Domain</p>
+                            <p className="text-xs font-black text-slate-700 uppercase tracking-tight leading-none pt-0.5">{selectedObservationForDossier?.domain}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 bg-white/50 p-3 sm:p-4 rounded-2xl border border-white/40 hover:bg-white/70 transition-all">
+                          <div className="p-2 bg-white rounded-lg shadow-sm">
+                            <Calendar className="h-3.5 w-3.5 text-[#A37FBC]" />
+                          </div>
+                          <div>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Cycle Date</p>
+                            <p className="text-xs font-black text-slate-700 uppercase tracking-tight leading-none pt-0.5">{selectedObservationForDossier?.date}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Precision Metric Gauge */}
+                    <div className="p-10 bg-slate-900 rounded-[3rem] shadow-2xl relative overflow-hidden group/gauge">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-[#A37FBC]/20 rounded-full blur-[60px]"></div>
+                      <div className="relative z-10 flex flex-col items-center">
+                        <p className="text-[10px] text-[#A37FBC] font-black uppercase tracking-[0.4em] mb-10">Precision Score v3</p>
+
+                        <div className="relative w-36 h-36 sm:w-48 sm:h-48 flex items-center justify-center">
+                          <svg className="w-full h-full -rotate-90 origin-center overflow-visible" viewBox="0 0 192 192">
+                            <circle
+                              cx="96"
+                              cy="96"
+                              r="84"
+                              fill="none"
+                              stroke="rgba(255,255,255,0.05)"
+                              strokeWidth="16"
+                            />
+                            <circle
+                              cx="96"
+                              cy="96"
+                              r="84"
+                              fill="none"
+                              stroke="url(#glowGradient)"
+                              strokeWidth="16"
+                              strokeDasharray={`${(selectedObservationForDossier?.score / 5) * 528} 528`}
+                              strokeLinecap="round"
+                              className="transition-all duration-[1500ms] ease-out drop-shadow-[0_0_12px_rgba(163,127,188,0.8)]"
+                            />
+                            <defs>
+                              <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stopColor="#A37FBC" />
+                                <stop offset="100%" stopColor="#6366f1" />
+                              </linearGradient>
+                            </defs>
+                          </svg>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center pt-2">
+                            <p className="text-4xl sm:text-6xl font-black text-white tracking-tighter">
+                              {selectedObservationForDossier?.score}
+                            </p>
+                            <p className="text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] -mt-1">/ 5.0 Rating</p>
+                          </div>
+                        </div>
+
+                        <div className="mt-10 grid grid-cols-2 gap-4 w-full">
+                          <div className="text-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                            <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Percentile</p>
+                            <p className="text-sm font-black text-white">{Math.round((selectedObservationForDossier?.score / 5) * 100)}%</p>
+                          </div>
+                          <div className="text-center p-4 bg-white/5 rounded-2xl border border-white/5">
+                            <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Status</p>
+                            <p className="text-sm font-black text-[#A37FBC] uppercase tracking-tighter">Peak</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Tactical Feedback & Insight */}
+                  <div className="lg:col-span-7 flex flex-col gap-8">
+                    <div className="flex-1 bg-white/50 backdrop-blur-md rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-12 border border-white/60 shadow-lg relative overflow-hidden group/feedback">
+                      <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover/feedback:opacity-10 transition-opacity">
+                        <MessageSquare className="h-40 w-40 text-slate-900" />
+                      </div>
+
+                      <div className="relative z-10 h-full flex flex-col">
+                        <div className="flex items-center gap-4 mb-10">
+                          <div className="p-3 bg-slate-900 rounded-2xl shadow-xl">
+                            <FileText className="h-6 w-6 text-[#A37FBC]" />
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-0.5">Observer Narrative</p>
+                            <h4 className="text-xl font-black text-slate-900 uppercase tracking-tighter italic">Tactical Field Notes</h4>
+                          </div>
+                        </div>
+
+                        <div className="flex-1 bg-white/30 rounded-[1.5rem] sm:rounded-[2rem] p-6 sm:p-8 border border-white/40 shadow-inner relative">
+                          <ScrollArea className="h-full pr-4 sm:pr-6 min-h-[280px] sm:min-h-[320px]">
+                            <div className="space-y-6">
+                              <p className="text-lg font-medium leading-relaxed text-slate-700 italic">
+                                "{selectedObservationForDossier?.feedback}"
+                              </p>
+                              <div className="pt-6 border-t border-black/[0.03] space-y-4">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Strategic Context</p>
+                                <p className="text-sm font-semibold text-slate-500 leading-relaxed">
+                                  This session was observed by <span className="text-slate-900 font-black underline decoration-[#A37FBC]/30">{selectedObservationForDossier?.observerName}</span>, focusing on institutional benchmarks within the <span className="text-[#A37FBC] font-black">{selectedObservationForDossier?.domain}</span> framework.
+                                </p>
+                              </div>
+                            </div>
+                          </ScrollArea>
+                        </div>
+
+                        <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-between gap-6 px-2 pt-2 border-t border-black/[0.03]">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 border border-white/50">
+                              <UserCheck className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Observer Rank</p>
+                              <p className="text-[11px] font-black text-slate-700 uppercase tracking-tighter">{selectedObservationForDossier?.tags[1] || 'Executive Leader'}</p>
+                            </div>
+                          </div>
+                          <Badge variant="outline" className="rounded-full px-4 py-1.5 text-[9px] font-black uppercase tracking-widest border-slate-200 text-slate-400">
+                            Verified Protocol
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-center sm:justify-end pr-0 sm:pr-4">
+                      <Button
+                        onClick={() => setDossierDialogOpen(false)}
+                        className="w-full sm:w-auto bg-slate-900 hover:bg-black text-white px-10 sm:px-16 h-14 sm:h-18 rounded-[1.5rem] sm:rounded-[2rem] text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-slate-200 group"
+                      >
+                        Dismiss Asset
+                        <ArrowRight className="h-4 w-4 ml-3 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </DialogContent>

@@ -58,28 +58,28 @@ export default function TeacherVectorProfile() {
     return (
         <div className="min-h-screen bg-[#fafafa] font-['Geist',sans-serif] pb-20">
             {/* Header / Nav */}
-            <header className="bg-white/40 backdrop-blur-md border-b border-black/[0.03] px-12 py-8 sticky top-0 z-30">
+            <header className="bg-white/40 backdrop-blur-md border-b border-black/[0.03] p-6 sm:px-12 sm:py-8 sticky top-0 z-30">
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
-                    <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-4 sm:gap-8">
                         <Button
                             variant="ghost"
                             onClick={() => navigate(`/${role}`)}
-                            className="h-14 w-14 rounded-2xl bg-white border border-slate-100 shadow-sm hover:bg-slate-50 text-slate-400 hover:text-[#A37FBC] transition-all"
+                            className="h-10 w-10 sm:h-14 sm:w-14 rounded-xl sm:rounded-2xl bg-white border border-slate-100 shadow-sm hover:bg-slate-50 text-slate-400 hover:text-[#A37FBC] transition-all p-0 flex items-center justify-center"
                         >
-                            <ArrowLeft className="h-6 w-6" />
+                            <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
                         </Button>
                         <div>
                             <div className="flex items-center gap-3 mb-1">
-                                <span className="w-6 h-[1.5px] bg-[#A37FBC] rounded-full"></span>
-                                <p className="text-[10px] font-black text-[#A37FBC] uppercase tracking-[0.4em]">Growth Telemetry Matrix</p>
+                                <span className="w-4 sm:w-6 h-[1.5px] bg-[#A37FBC] rounded-full"></span>
+                                <p className="text-[8px] sm:text-[10px] font-black text-[#A37FBC] uppercase tracking-[0.4em]">Growth Telemetry Matrix</p>
                             </div>
-                            <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tight">Growth Vector: {teacher.name}</h1>
+                            <h1 className="text-xl sm:text-3xl font-black text-slate-900 uppercase tracking-tight line-clamp-1">Growth Vector: {teacher.name}</h1>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <div className="p-12 max-w-7xl mx-auto w-full space-y-12">
+            <div className="p-6 sm:p-12 max-w-7xl mx-auto w-full space-y-12">
                 {/* Profile Overview Banner */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <Card className="lg:col-span-2 bg-white/60 backdrop-blur-2xl border-none rounded-[3rem] shadow-sm overflow-hidden p-12">

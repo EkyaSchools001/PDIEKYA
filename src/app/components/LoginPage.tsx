@@ -93,26 +93,26 @@ export default function LoginPage() {
 
         <Card className="bg-white/50 border-white/50 backdrop-blur-3xl shadow-[0_20px_50px_rgb(0,0,0,0.05)] border-none rounded-[2.5rem] overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-2 bg-[#A37FBC]"></div>
-          <CardHeader className="p-10 pb-6 space-y-6">
+          <CardHeader className="p-6 sm:p-10 pb-4 sm:pb-6 space-y-4 sm:space-y-6">
             <div className="flex justify-center">
-              <div className="p-4 bg-white rounded-3xl shadow-sm border border-slate-50">
+              <div className="p-3 sm:p-4 bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-50">
                 <img
                   src="/logo.png"
                   alt="Ekya School PDI"
-                  className="h-24 w-24 object-contain brightness-110"
+                  className="h-16 w-16 sm:h-24 sm:w-24 object-contain brightness-110"
                 />
               </div>
             </div>
-            <div className="text-center space-y-2">
-              <CardTitle className="text-3xl font-black text-slate-900 tracking-tighter uppercase">
+            <div className="text-center space-y-1 sm:space-y-2">
+              <CardTitle className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">
                 Portal <span className="text-[#A37FBC]">Access</span>
               </CardTitle>
-              <CardDescription className="text-slate-500 font-bold text-[10px] uppercase tracking-[0.3em]">
+              <CardDescription className="text-slate-400 font-bold text-[8px] sm:text-[10px] uppercase tracking-[0.2em] sm:tracking-[0.3em]">
                 Authenticating as {getRoleTitle()}
               </CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="p-10 pt-0">
+          <CardContent className="p-6 sm:p-10 pt-0">
             <form onSubmit={handleSubmit} className="space-y-8">
               <div className="space-y-3">
                 <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Identity Email</Label>

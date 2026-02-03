@@ -19,7 +19,9 @@ export interface Announcement {
 export interface GalleryImage {
   id: string;
   url: string;
-  cap: string;
+  cap?: string;
+  duration?: number;
+  expiryDate?: string;
 }
 
 interface AppContextType {

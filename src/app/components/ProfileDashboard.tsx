@@ -41,7 +41,7 @@ export default function ProfileDashboard({ user, onBack }: ProfileDashboardProps
     const avatarColor = getAvatarColor();
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
             {/* Back Button */}
             <Button
                 variant="ghost"
@@ -53,9 +53,9 @@ export default function ProfileDashboard({ user, onBack }: ProfileDashboardProps
             </Button>
 
             {/* Profile Header Card */}
-            <Card className="bg-white/60 backdrop-blur-md border-none rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.03)] overflow-hidden">
+            <Card className="bg-white/60 backdrop-blur-md border-none rounded-[2.5rem] sm:rounded-[3rem] shadow-[0_8px_30px_rgb(0,0,0,0.03)] overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-2" style={{ backgroundColor: avatarColor }}></div>
-                <CardContent className="p-12 text-center">
+                <CardContent className="p-6 sm:p-12 text-center">
                     {/* Profile Picture */}
                     <div className="flex justify-center mb-8">
                         {user.profilePicture ? (
@@ -75,7 +75,7 @@ export default function ProfileDashboard({ user, onBack }: ProfileDashboardProps
                     </div>
 
                     {/* User Name */}
-                    <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tight mb-2">
+                    <h1 className="text-2xl sm:text-4xl font-black text-slate-900 uppercase tracking-tight mb-2">
                         {user.name}
                     </h1>
 

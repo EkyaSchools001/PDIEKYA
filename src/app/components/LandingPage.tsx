@@ -77,38 +77,50 @@ export default function LandingPage() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-400/5 rounded-full blur-[120px] animate-pulse animation-delay-2000"></div>
       </div>
 
+      {/* Watermark Background */}
+      <div
+        className="fixed inset-0 z-[1] pointer-events-none overflow-hidden flex items-center justify-center opacity-[0.70]"
+        aria-hidden="true"
+      >
+        <img
+          src="/watermark.jpg"
+          alt=""
+          className="min-w-full min-h-full object-cover scale-[1.02]"
+        />
+      </div>
+
       {/* Global Header */}
-      <header className="relative w-full py-6 px-8 lg:px-12 z-20 border-b border-black/[0.03] bg-white/40 backdrop-blur-md sticky top-0 transition-all">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <div className="relative group">
+      <header className="relative w-full py-4 sm:py-6 px-4 sm:px-8 lg:px-12 z-20 border-b border-black/[0.03] bg-white/40 backdrop-blur-md sticky top-0 transition-all">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 sm:gap-6">
+            <div className="relative group shrink-0">
               <div className="absolute -inset-2 bg-gradient-to-r from-[#A37FBC] to-purple-400 rounded-2xl blur opacity-0 group-hover:opacity-10 transition duration-500"></div>
               <img
                 src="/logo.png"
                 alt="Ekya School PDI"
-                className="relative h-20 w-20 object-contain filter drop-shadow-sm brightness-110"
+                className="relative h-16 w-16 sm:h-28 sm:w-28 object-contain filter drop-shadow-sm brightness-110"
               />
             </div>
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-black tracking-tight text-slate-900">
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-2xl lg:text-3xl font-black tracking-tight text-slate-900 truncate">
                 EKYA <span className="text-[#A37FBC]">SCHOOL</span> PDI
               </h1>
-              <p className="text-slate-400 text-[10px] font-bold tracking-[0.3em] uppercase opacity-70 mt-0.5">
+              <p className="text-black text-[8px] sm:text-[10px] font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase mt-0.5 truncate">
                 Precision PD Platform
               </p>
             </div>
           </div>
           <Button
             onClick={() => navigate('/login')}
-            className="bg-[#A37FBC] text-white hover:bg-[#8e6ba8] font-bold px-8 h-12 rounded-full shadow-lg shadow-[#A37FBC]/20 transition-all hover:scale-105 active:scale-95 border-none"
+            className="bg-[#A37FBC] text-white hover:bg-[#8e6ba8] font-black px-4 sm:px-8 h-10 sm:h-12 rounded-full shadow-lg shadow-[#A37FBC]/20 transition-all hover:scale-105 active:scale-95 border-none text-[10px] sm:text-xs uppercase tracking-widest shrink-0"
           >
-            Access Portals
+            <span className="hidden xs:inline">Access </span>Portals
           </Button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col relative z-10 p-8 lg:p-16 max-w-7xl mx-auto w-full">
+      <main className="flex-1 flex flex-col relative z-10 p-4 sm:p-8 lg:p-16 max-w-7xl mx-auto w-full">
         {/* Two-Column Layout Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:items-start">
 
@@ -117,19 +129,19 @@ export default function LandingPage() {
             <div className="space-y-1 px-4">
               <div className="flex items-center gap-3">
                 <span className="w-8 h-[2px] bg-[#A37FBC] rounded-full"></span>
-                <h2 className="text-sm font-black text-[#A37FBC] uppercase tracking-[0.4em]">Bulletins</h2>
+                <h2 className="text-sm font-black text-black uppercase tracking-[0.4em]">Bulletins</h2>
               </div>
               <h3 className="text-4xl font-extrabold text-slate-900 tracking-tight">Latest Announcements</h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
               {announcements.map((ann) => (
                 <Card key={ann.id} className="bg-white/50 border-white/50 backdrop-blur-2xl text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgb(163,127,188,0.12)] transition-all duration-700 group border-none rounded-[2rem] overflow-hidden flex flex-col h-full">
-                  <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-10 transition-opacity duration-700">
-                    <IconChevronRight className="h-20 w-20 text-[#A37FBC]" />
+                  <div className="absolute top-0 right-0 p-6 sm:p-8 opacity-0 group-hover:opacity-10 transition-opacity duration-700">
+                    <IconChevronRight className="h-16 w-16 sm:h-20 sm:w-20 text-[#A37FBC]" />
                   </div>
 
-                  <CardHeader className="p-8 pb-4 flex-1">
+                  <CardHeader className="p-6 sm:p-8 pb-4 flex-1">
                     <div className="flex items-center gap-3 mb-6">
                       <Badge variant="outline" className={`${getAnnouncementBadgeColor(ann.type)} rounded-full px-4 py-1 font-bold text-[10px] uppercase tracking-wider border-none shadow-sm`}>
                         {ann.type}
@@ -174,7 +186,7 @@ export default function LandingPage() {
             <div className="space-y-1 px-4">
               <div className="flex items-center gap-3">
                 <span className="w-8 h-[2px] bg-[#A37FBC] rounded-full"></span>
-                <h2 className="text-sm font-black text-[#A37FBC] uppercase tracking-[0.4em]">Life at Ekya</h2>
+                <h2 className="text-sm font-black text-black uppercase tracking-[0.4em]">Life at Ekya</h2>
               </div>
               <h3 className="text-3xl font-extrabold text-slate-900 tracking-tight">Campus Gallery</h3>
             </div>
