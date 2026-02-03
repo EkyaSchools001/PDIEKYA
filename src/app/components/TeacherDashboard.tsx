@@ -7,10 +7,13 @@ import { Badge } from '@/app/components/ui/badge';
 import { Progress } from '@/app/components/ui/progress';
 import { ScrollArea } from '@/app/components/ui/scroll-area';
 import { Textarea } from '@/app/components/ui/textarea';
-import { LogOut, BookOpen, Calendar, Target, MessageSquare, CheckCircle, LucideIcon, ChevronRight, ArrowLeft, CheckCircle2, ShieldCheck, Clock, UserCheck } from 'lucide-react';
+import { LogOut, BookOpen, Calendar, Target, MessageSquare, CheckCircle, LucideIcon, ChevronRight, ArrowLeft, CheckCircle2, ShieldCheck, Clock, UserCheck, LayoutGrid, ArrowRight } from 'lucide-react';
 import { Separator } from '@/app/components/ui/separator';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/app/components/ui/dialog';
 import { Users, ClipboardCheck, FileText } from 'lucide-react';
+import { cn } from '@/app/components/ui/utils';
+import TrainingCalendar from '@/app/components/TrainingCalendar';
+import ProfileDashboard from '@/app/components/ProfileDashboard';
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
@@ -38,6 +41,9 @@ export default function TeacherDashboard() {
   const [dossierDialogOpen, setDossierDialogOpen] = useState(false);
   const [selectedObservationForDossier, setSelectedObservationForDossier] = useState<any>(null);
   const [pendingReg, setPendingReg] = useState<{ id: string, type: 'course' | 'training', title: string, hours?: number, date?: string } | null>(null);
+  const [trainingViewMode, setTrainingViewMode] = useState<'calendar' | 'cards'>('calendar');
+  const [isLedgerVisible, setIsLedgerVisible] = useState(false);
+  const [isAdminLedgerVisible, setIsAdminLedgerVisible] = useState(true);
 
   useEffect(() => {
     if (!isAuthenticated || !currentUser) {
@@ -194,15 +200,19 @@ export default function TeacherDashboard() {
         </nav>
 
         <div className="p-8 border-t border-black/[0.03] bg-white/40">
-          <div className="flex items-center px-2">
-            <div className="w-10 h-10 rounded-2xl bg-[#A37FBC]/10 flex items-center justify-center text-[#A37FBC] font-black mr-4 text-sm border border-[#A37FBC]/10 shadow-inner">
+          <button
+            onClick={() => setActiveView('profile')}
+            className="flex items-center px-2 w-full hover:bg-white/50 rounded-2xl p-3 transition-all group"
+          >
+            <div className="w-10 h-10 rounded-2xl bg-[#A37FBC]/10 flex items-center justify-center text-[#A37FBC] font-black mr-4 text-sm border border-[#A37FBC]/10 shadow-inner group-hover:bg-[#A37FBC] group-hover:text-white transition-all">
               {currentUser.name[0]}
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-black text-slate-900 truncate tracking-tight">{currentUser.name}</p>
-              <p className="text-[10px] text-slate-400 truncate uppercase font-bold tracking-widest">{currentUser.campus}</p>
+            <div className="min-w-0 flex-1 text-left">
+              <p className="text-sm font-black text-slate-900 truncate tracking-tight group-hover:text-[#A37FBC] transition-colors">{currentUser.name}</p>
+              <p className="text-[10px] text-slate-400 truncate uppercase font-bold tracking-widest">View Profile</p>
             </div>
-          </div>
+            <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-[#A37FBC] transition-colors" />
+          </button>
         </div>
       </aside>
 
@@ -292,13 +302,34 @@ export default function TeacherDashboard() {
                   </div>
 
                   <Card className="bg-transparent border-none shadow-none">
-                    <CardHeader className="p-0 mb-8">
-                      <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tight">Observation Ledger</CardTitle>
-                      <CardDescription className="text-sm font-semibold text-slate-400">Tactical feedback and pedagogical insights</CardDescription>
+                    <CardHeader className="p-0 mb-8 flex flex-row items-center justify-between space-y-0">
+                      <div>
+                        <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tight">Observation Ledger</CardTitle>
+                        <CardDescription className="text-sm font-semibold text-slate-400">Tactical feedback and pedagogical insights</CardDescription>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-[10px] font-black uppercase tracking-widest text-[#A37FBC] hover:bg-[#A37FBC]/5 rounded-xl px-4"
+                        onClick={() => setIsLedgerVisible(!isLedgerVisible)}
+                      >
+                        {isLedgerVisible ? 'Collapse Ledger' : 'View Ledger'}
+                      </Button>
                     </CardHeader>
                     <CardContent className="p-0">
                       <div className="space-y-6">
-                        {observations.length === 0 ? (
+                        {!isLedgerVisible ? (
+                          <div
+                            className="p-16 text-center bg-white/40 rounded-[2.5rem] border-2 border-dashed border-[#A37FBC]/20 hover:bg-[#A37FBC]/5 hover:border-[#A37FBC]/40 transition-all cursor-pointer group"
+                            onClick={() => setIsLedgerVisible(true)}
+                          >
+                            <div className="p-4 bg-[#A37FBC]/10 rounded-2xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform">
+                              <MessageSquare className="h-8 w-8 text-[#A37FBC]" />
+                            </div>
+                            <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Ledger Locked</p>
+                            <p className="text-[10px] text-slate-300 uppercase font-black tracking-widest mt-1">Click to access observation history</p>
+                          </div>
+                        ) : observations.length === 0 ? (
                           <div className="p-20 text-center bg-white/40 rounded-[2rem] border-2 border-dashed border-slate-100">
                             <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No active records detected</p>
                           </div>
@@ -394,69 +425,191 @@ export default function TeacherDashboard() {
                       </div>
                     </CardContent>
                   </Card>
+
+                  {/* Administrative Feedback Section (Master Form) */}
+                  <Card className="bg-white/40 backdrop-blur-2xl border-2 border-indigo-100/50 rounded-[3rem] shadow-xl shadow-indigo-500/5 overflow-hidden">
+                    <div className="h-2 bg-indigo-500 w-full"></div>
+                    <CardHeader className="p-10 pb-6 flex flex-row items-center justify-between space-y-0">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 bg-indigo-50 rounded-2xl">
+                          <ClipboardCheck className="h-6 w-6 text-indigo-600" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tight">Administrative Feedback [v2.1]</CardTitle>
+                          <CardDescription className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Standardized Executive Evaluations</CardDescription>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsAdminLedgerVisible(!isAdminLedgerVisible)}
+                        className="hover:bg-indigo-50 text-indigo-600 rounded-full h-10 w-10 p-0"
+                      >
+                        <ChevronRight className={cn("h-5 w-5 transition-transform duration-300", isAdminLedgerVisible ? "rotate-90" : "rotate-0")} />
+                      </Button>
+                    </CardHeader>
+
+                    {isAdminLedgerVisible && (
+                      <CardContent className="p-10 pt-0 space-y-6">
+                        {observations.filter(obs => obs.tags.includes('Master Form')).length > 0 ? (
+                          observations
+                            .filter(obs => obs.tags.includes('Master Form'))
+                            .map((obs) => (
+                              <div key={obs.id} className="group relative bg-white/60 p-8 rounded-[2.5rem] border border-indigo-50 hover:border-indigo-200 transition-all hover:shadow-lg hover:shadow-indigo-500/5">
+                                <div className="flex justify-between items-start mb-6">
+                                  <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                      <p className="text-sm font-black text-slate-800 tracking-tight">{obs.observerName}</p>
+                                      <Badge className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100 rounded-full px-3 py-0.5 text-[9px] font-black uppercase tracking-widest border-none">
+                                        {obs.tags.find(tag => tag !== 'Master Form') || 'Executive'}
+                                      </Badge>
+                                    </div>
+                                    <p className="text-sm font-black text-indigo-500 uppercase tracking-tight">{obs.domain}</p>
+                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                      {new Date(obs.date).toLocaleDateString(undefined, { dateStyle: 'long' })}
+                                    </p>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="text-[9px] text-indigo-400 uppercase font-black tracking-widest mb-1">Precision Score</p>
+                                    <p className="text-2xl font-black text-indigo-600 tracking-tighter">
+                                      {obs.score} <span className="text-indigo-200 text-sm">/ 5.0</span>
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="bg-indigo-50/30 p-6 rounded-2xl border border-indigo-100/50">
+                                  <p className="text-sm text-slate-700 leading-relaxed font-semibold italic">"{obs.feedback}"</p>
+                                </div>
+                                <div className="mt-6 flex justify-end">
+                                  <Button
+                                    variant="link"
+                                    className="text-[10px] font-black uppercase tracking-widest text-indigo-500 hover:text-indigo-700 p-0 h-auto"
+                                    onClick={() => handleViewDossier(obs)}
+                                  >
+                                    Review Detailed Dossier <ArrowRight className="h-3 w-3 ml-2" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))
+                        ) : (
+                          <div className="p-20 text-center bg-indigo-50/20 rounded-[2.5rem] border-2 border-dashed border-indigo-100">
+                            <ClipboardCheck className="h-10 w-10 text-indigo-100 mx-auto mb-4" />
+                            <p className="text-indigo-300 font-black uppercase tracking-[0.2em] text-[10px]">No Administrative evaluations prioritized for this period</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    )}
+                  </Card>
                 </div>
               )}
 
               {activeView === 'training' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {trainingEvents.map((event) => {
-                    const status = getTrainingStatus(event.id);
-                    return (
-                      <Card key={event.id} className="bg-white/60 backdrop-blur-md border-none rounded-[3rem] shadow-sm hover:shadow-xl hover:shadow-[#A37FBC]/10 transition-all p-10 group overflow-hidden relative">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-[#A37FBC]/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
-                        <div className="flex justify-between items-start mb-8 relative z-10">
-                          <div className="space-y-1">
-                            <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter group-hover:text-[#A37FBC] transition-colors">{event.title}</h3>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{event.topic}</p>
-                          </div>
-                          <Badge className={`border-none rounded-full px-5 py-1 text-[10px] font-black uppercase tracking-widest shadow-sm ${status === 'Attended' ? 'bg-emerald-500 text-white' :
-                            status === 'Registered' ? 'bg-[#A37FBC] text-white' :
-                              'bg-[#A37FBC]/10 text-[#A37FBC]'
-                            }`}>
-                            {status || event.status}
-                          </Badge>
-                        </div>
-                        <div className="space-y-5 mb-10 relative z-10">
-                          <div className="flex items-center gap-4">
-                            <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-50">
-                              <Calendar className="h-5 w-5 text-[#A37FBC]" />
+                <div className="space-y-8">
+                  {/* View Toggle */}
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Training Schedule</h2>
+                      <p className="text-sm font-semibold text-slate-400 mt-1">Professional development opportunities</p>
+                    </div>
+                    <div className="flex gap-2 bg-white/60 p-2 rounded-2xl border border-slate-100">
+                      <Button
+                        variant={trainingViewMode === 'calendar' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => setTrainingViewMode('calendar')}
+                        className={`rounded-xl text-[10px] font-black uppercase tracking-widest ${trainingViewMode === 'calendar'
+                          ? 'bg-[#A37FBC] text-white hover:bg-[#8e6ba8]'
+                          : 'text-slate-500 hover:text-slate-900'
+                          }`}
+                      >
+                        <Calendar className="h-3 w-3 mr-2" />
+                        Calendar
+                      </Button>
+                      <Button
+                        variant={trainingViewMode === 'cards' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => setTrainingViewMode('cards')}
+                        className={`rounded-xl text-[10px] font-black uppercase tracking-widest ${trainingViewMode === 'cards'
+                          ? 'bg-[#A37FBC] text-white hover:bg-[#8e6ba8]'
+                          : 'text-slate-500 hover:text-slate-900'
+                          }`}
+                      >
+                        <LayoutGrid className="h-3 w-3 mr-2" />
+                        Cards
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Calendar View */}
+                  {trainingViewMode === 'calendar' && (
+                    <TrainingCalendar
+                      events={trainingEvents}
+                      onRegister={handleRegisterTraining}
+                      getTrainingStatus={getTrainingStatus}
+                    />
+                  )}
+
+                  {/* Card View */}
+                  {trainingViewMode === 'cards' && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      {trainingEvents.map((event) => {
+                        const status = getTrainingStatus(event.id);
+                        return (
+                          <Card key={event.id} className="bg-white/60 backdrop-blur-md border-none rounded-[3rem] shadow-sm hover:shadow-xl hover:shadow-[#A37FBC]/10 transition-all p-10 group overflow-hidden relative">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#A37FBC]/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700"></div>
+                            <div className="flex justify-between items-start mb-8 relative z-10">
+                              <div className="space-y-1">
+                                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter group-hover:text-[#A37FBC] transition-colors">{event.title}</h3>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{event.topic}</p>
+                              </div>
+                              <Badge className={`border-none rounded-full px-5 py-1 text-[10px] font-black uppercase tracking-widest shadow-sm ${status === 'Attended' ? 'bg-emerald-500 text-white' :
+                                status === 'Registered' ? 'bg-[#A37FBC] text-white' :
+                                  'bg-[#A37FBC]/10 text-[#A37FBC]'
+                                }`}>
+                                {status || event.status}
+                              </Badge>
                             </div>
-                            <span className="text-sm font-black text-slate-600 uppercase tracking-tight">
-                              {new Date(event.date).toLocaleDateString(undefined, { dateStyle: 'long' })}
-                              <span className="text-[#A37FBC] mx-2">•</span>
-                              {event.time}
-                            </span>
-                          </div>
-                        </div>
-                        <Button
-                          onClick={() => event.status === 'Open' && !status && handleRegisterTraining(event.id)}
-                          disabled={event.status !== 'Open' || !!status}
-                          className={`w-full rounded-2xl h-14 text-xs font-black uppercase tracking-widest transition-all shadow-xl border-none relative z-10 ${status === 'Attended' ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/20' :
-                            status === 'Registered' ? 'bg-slate-100 text-slate-400 shadow-none cursor-default' :
-                              event.status === 'Open' ? 'bg-[#A37FBC] hover:bg-[#8e6ba8] text-white shadow-[#A37FBC]/20' :
-                                'bg-slate-100 text-slate-400 shadow-none'
-                            }`}
-                        >
-                          {status === 'Attended' ? 'Training Completed' :
-                            status === 'Registered' ? 'Successfully Registered' :
-                              event.status === 'Open' ? 'Initialize Registration' :
-                                'Registration Closed'}
-                        </Button>
-                        {status === 'Registered' && new Date() >= new Date(event.date) && (
-                          <Button
-                            onClick={() => {
-                              const attendance = getTrainingAttendanceByTeacher(currentUser.empId).find(a => a.eventId === event.id);
-                              if (attendance) markAttendance(attendance.id, true);
-                            }}
-                            className="w-full mt-2 rounded-2xl h-14 text-xs font-black uppercase tracking-widest bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/20 shadow-xl border-none"
-                          >
-                            <CheckCircle2 className="h-4 w-4 mr-2" />
-                            Confirm Attendance
-                          </Button>
-                        )}
-                      </Card>
-                    );
-                  })}
+                            <div className="space-y-5 mb-10 relative z-10">
+                              <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white rounded-2xl shadow-sm border border-slate-50">
+                                  <Calendar className="h-5 w-5 text-[#A37FBC]" />
+                                </div>
+                                <span className="text-sm font-black text-slate-600 uppercase tracking-tight">
+                                  {new Date(event.date).toLocaleDateString(undefined, { dateStyle: 'long' })}
+                                  <span className="text-[#A37FBC] mx-2">•</span>
+                                  {event.time}
+                                </span>
+                              </div>
+                            </div>
+                            <Button
+                              onClick={() => event.status === 'Open' && !status && handleRegisterTraining(event)}
+                              disabled={event.status !== 'Open' || !!status}
+                              className={`w-full rounded-2xl h-14 text-xs font-black uppercase tracking-widest transition-all shadow-xl border-none relative z-10 ${status === 'Attended' ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/20' :
+                                status === 'Registered' ? 'bg-slate-100 text-slate-400 shadow-none cursor-default' :
+                                  event.status === 'Open' ? 'bg-[#A37FBC] hover:bg-[#8e6ba8] text-white shadow-[#A37FBC]/20' :
+                                    'bg-slate-100 text-slate-400 shadow-none'
+                                }`}
+                            >
+                              {status === 'Attended' ? 'Training Completed' :
+                                status === 'Registered' ? 'Successfully Registered' :
+                                  event.status === 'Open' ? 'Initialize Registration' :
+                                    'Registration Closed'}
+                            </Button>
+                            {status === 'Registered' && new Date() >= new Date(event.date) && (
+                              <Button
+                                onClick={() => {
+                                  const attendance = getTrainingAttendanceByTeacher(currentUser.empId).find(a => a.eventId === event.id);
+                                  if (attendance) markAttendance(attendance.id, true);
+                                }}
+                                className="w-full mt-2 rounded-2xl h-14 text-xs font-black uppercase tracking-widest bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/20 shadow-xl border-none"
+                              >
+                                <CheckCircle2 className="h-4 w-4 mr-2" />
+                                Confirm Attendance
+                              </Button>
+                            )}
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -535,6 +688,13 @@ export default function TeacherDashboard() {
                     ))}
                   </div>
                 </div>
+              )}
+
+              {activeView === 'profile' && (
+                <ProfileDashboard
+                  user={currentUser}
+                  onBack={() => setActiveView('observations')}
+                />
               )}
 
               {activeView === 'pd-report' && (
@@ -731,8 +891,8 @@ export default function TeacherDashboard() {
                         <span>Recorded: {selectedObservationForDossier?.date}</span>
                       </div>
                       <div className="flex items-center gap-4 text-xs font-bold text-slate-500 uppercase tracking-wide">
-                        <Users className="h-4 w-4 text-[#A37FBC]" />
-                        <span>Observer: {selectedObservationForDossier?.observerName}</span>
+                        <UserCheck className="h-4 w-4 text-[#A37FBC]" />
+                        <span>Observer: {selectedObservationForDossier?.observerName} ({selectedObservationForDossier?.tags[1] || 'Executive'})</span>
                       </div>
                     </div>
                   </div>
@@ -798,7 +958,7 @@ export default function TeacherDashboard() {
             </div>
           </DialogContent>
         </Dialog>
-      </main>
-    </div>
+      </main >
+    </div >
   );
 }

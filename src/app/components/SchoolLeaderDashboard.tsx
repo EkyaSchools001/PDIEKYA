@@ -13,6 +13,10 @@ import { Label } from '@/app/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
 import { LogOut, ClipboardCheck, Users, BarChart3, PlusCircle, FileText, ChevronRight, BookOpen, Calendar } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/app/components/ui/dialog';
+import ProfileDashboard from '@/app/components/ProfileDashboard';
+import MasterObservationForm from '@/app/components/MasterObservationForm';
+import TrainingCalendar from '@/app/components/TrainingCalendar';
+import { LayoutGrid } from 'lucide-react';
 
 export default function SchoolLeaderDashboard() {
   const navigate = useNavigate();
@@ -37,7 +41,6 @@ export default function SchoolLeaderDashboard() {
   const [observationDialogOpen, setObservationDialogOpen] = useState(false);
   const [courseDialogOpen, setCourseDialogOpen] = useState(false);
   const [goalDialogOpen, setGoalDialogOpen] = useState(false);
-  const [vectorDialogOpen, setVectorDialogOpen] = useState(false);
   const [dossierDialogOpen, setDossierDialogOpen] = useState(false);
   const [selectedTeacherForAction, setSelectedTeacherForAction] = useState<any>(null);
   const [selectedObservationForDossier, setSelectedObservationForDossier] = useState<any>(null);
@@ -54,6 +57,7 @@ export default function SchoolLeaderDashboard() {
   // Report Filter State
   const [reportTimeframe, setReportTimeframe] = useState('all');
   const [reportCampus, setReportCampus] = useState('all');
+  const [trainingViewMode, setTrainingViewMode] = useState<'calendar' | 'analytics'>('calendar');
 
   // Observation form state
   const [selectedTeacher, setSelectedTeacher] = useState('');
@@ -67,6 +71,8 @@ export default function SchoolLeaderDashboard() {
   const [courseHours, setCourseHours] = useState('');
   const [coursePrerequisites, setCoursePrerequisites] = useState('None');
   const [courseDescription, setCourseDescription] = useState('');
+
+  const [isLedgerVisible, setIsLedgerVisible] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated || !currentUser) {
@@ -206,8 +212,18 @@ export default function SchoolLeaderDashboard() {
   };
 
   const handleViewVector = (teacher: any) => {
-    setSelectedTeacherForAction(teacher);
-    setVectorDialogOpen(true);
+    navigate(`/school-leader/vector/${teacher.empId}`);
+  };
+
+  const handleRegisterTraining = (event: any) => {
+    // School leaders might not register themselves, but we can provide a placeholder
+    // or allow them to view details. For now, we'll keep it consistent with the interface.
+    console.log('Leader registering/viewing event:', event);
+  };
+
+  const getTrainingStatus = (eventId: string) => {
+    // Basic status check for the leader
+    return null;
   };
 
   const handleViewDossier = (obs: any) => {
@@ -272,15 +288,19 @@ export default function SchoolLeaderDashboard() {
         </nav>
 
         <div className="p-8 border-t border-black/[0.03] bg-white/40">
-          <div className="flex items-center px-2">
-            <div className="w-10 h-10 rounded-2xl bg-[#A37FBC]/10 flex items-center justify-center text-[#A37FBC] font-black mr-4 text-sm border border-[#A37FBC]/10 shadow-inner">
+          <button
+            onClick={() => setActiveView('profile')}
+            className="flex items-center px-2 w-full hover:bg-white/50 rounded-2xl p-3 transition-all group"
+          >
+            <div className="w-10 h-10 rounded-2xl bg-[#A37FBC]/10 flex items-center justify-center text-[#A37FBC] font-black mr-4 text-sm border border-[#A37FBC]/10 shadow-inner group-hover:bg-[#A37FBC] group-hover:text-white transition-all">
               {currentUser.name[0]}
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-black text-slate-900 truncate tracking-tight">{currentUser.name}</p>
-              <p className="text-[10px] text-slate-400 truncate uppercase font-bold tracking-widest">{currentUser.campus}</p>
+            <div className="min-w-0 flex-1 text-left">
+              <p className="text-sm font-black text-slate-900 truncate tracking-tight group-hover:text-[#A37FBC] transition-colors">{currentUser.name}</p>
+              <p className="text-[10px] text-slate-400 truncate uppercase font-bold tracking-widest">View Profile</p>
             </div>
-          </div>
+            <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-[#A37FBC] transition-colors" />
+          </button>
         </div>
       </aside>
 
@@ -530,68 +550,117 @@ export default function SchoolLeaderDashboard() {
                 <div className="space-y-8">
                   <div className="flex items-center justify-between px-1">
                     <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Recent Oversight Activity</h2>
+                    <Button
+                      onClick={() => setActiveView('masterForm')}
+                      className="h-12 px-8 rounded-full bg-[#A37FBC] hover:bg-[#8e6ba8] text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-[#A37FBC]/20 transition-all hover:scale-105 active:scale-95"
+                    >
+                      <PlusCircle className="h-4 w-4 mr-3" />
+                      Create Master Observation
+                    </Button>
                   </div>
                   <div className="space-y-6">
-                    {myObservations.length === 0 ? (
-                      <div className="p-20 text-center bg-white/40 rounded-[3rem] border-2 border-dashed border-slate-100">
-                        <ClipboardCheck className="h-12 w-12 text-slate-200 mx-auto mb-4" />
-                        <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No administrative records detected</p>
-                      </div>
+                    {!isLedgerVisible ? (
+                      <Card
+                        className="bg-white/60 backdrop-blur-md border-2 border-dashed border-[#A37FBC]/20 rounded-[3rem] p-16 text-center hover:bg-[#A37FBC]/5 hover:border-[#A37FBC]/40 transition-all cursor-pointer group"
+                        onClick={() => setIsLedgerVisible(true)}
+                      >
+                        <div className="p-6 bg-[#A37FBC]/10 rounded-full w-fit mx-auto mb-6 group-hover:scale-110 transition-transform">
+                          <ClipboardCheck className="h-10 w-10 text-[#A37FBC]" />
+                        </div>
+                        <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">Observation Ledger</h3>
+                        <p className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-8">Access tactical feedback and performance records</p>
+                        <Button className="rounded-full bg-[#A37FBC] text-white px-8 h-12 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-[#A37FBC]/20">
+                          Access Secure Ledger
+                        </Button>
+                      </Card>
                     ) : (
-                      myObservations.map((obs) => (
-                        <Card key={obs.id} className="bg-white/60 backdrop-blur-md border-none rounded-[2.5rem] shadow-sm hover:shadow-xl hover:shadow-[#A37FBC]/10 transition-all group overflow-hidden">
-                          <CardHeader className="p-8 pb-4">
-                            <div className="flex justify-between items-start">
-                              <div className="flex items-center gap-5">
-                                <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-[#A37FBC]/10 group-hover:text-[#A37FBC] transition-colors">
-                                  <Users className="h-6 w-6" />
+                      <div className="space-y-6">
+                        <div className="flex justify-center mb-4">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-[#A37FBC] rounded-full"
+                            onClick={() => setIsLedgerVisible(false)}
+                          >
+                            <ChevronRight className="h-3 w-3 mr-2 rotate-90" />
+                            Collapse Ledger
+                          </Button>
+                        </div>
+                        {myObservations.length === 0 ? (
+                          <div className="p-20 text-center bg-white/40 rounded-[3rem] border-2 border-dashed border-slate-100">
+                            <ClipboardCheck className="h-12 w-12 text-slate-200 mx-auto mb-4" />
+                            <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No administrative records detected</p>
+                          </div>
+                        ) : (
+                          myObservations.map((obs) => (
+                            <Card key={obs.id} className="bg-white/60 backdrop-blur-md border-none rounded-[2.5rem] shadow-sm hover:shadow-xl hover:shadow-[#A37FBC]/10 transition-all group overflow-hidden">
+                              <CardHeader className="p-8 pb-4">
+                                <div className="flex justify-between items-start">
+                                  <div className="flex items-center gap-5">
+                                    <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-[#A37FBC]/10 group-hover:text-[#A37FBC] transition-colors">
+                                      <Users className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                      <div className="flex items-center gap-2">
+                                        <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tight">{obs.teacherName}</CardTitle>
+                                        <Badge className="bg-slate-100 text-slate-500 rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-widest border-none">
+                                          {obs.tags.find(t => t !== 'Master Form') || 'Executive'}
+                                        </Badge>
+                                      </div>
+                                      <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
+                                        {new Date(obs.date).toLocaleDateString(undefined, { dateStyle: 'medium' })} <span className="text-[#A37FBC] mx-2">•</span> {obs.domain}
+                                      </CardDescription>
+                                    </div>
+                                  </div>
+                                  <Badge
+                                    className={`rounded-full px-5 py-1 text-[10px] font-black uppercase tracking-widest border-none shadow-sm ${obs.status === 'Reflected'
+                                      ? 'bg-emerald-500 text-white'
+                                      : obs.status === 'Acknowledged'
+                                        ? 'bg-blue-500 text-white'
+                                        : 'bg-amber-500 text-white'
+                                      }`}
+                                  >
+                                    {obs.status}
+                                  </Badge>
                                 </div>
-                                <div>
-                                  <CardTitle className="text-xl font-black text-slate-900 uppercase tracking-tight">{obs.teacherName}</CardTitle>
-                                  <CardDescription className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
-                                    {new Date(obs.date).toLocaleDateString(undefined, { dateStyle: 'medium' })} <span className="text-[#A37FBC] mx-2">•</span> {obs.domain}
-                                  </CardDescription>
+                              </CardHeader>
+                              <CardContent className="p-8 pt-0">
+                                <div className="flex items-center justify-between p-6 bg-slate-50/50 rounded-2xl border border-slate-50 mb-6">
+                                  <div>
+                                    <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-1">Observation Precision</p>
+                                    <p className="text-3xl font-black text-[#A37FBC] tracking-tighter">
+                                      {obs.score} <span className="text-xs text-slate-300 font-bold px-1 select-none">/</span> <span className="text-slate-300">5.0</span>
+                                    </p>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    className="rounded-full text-[10px] font-black uppercase tracking-widest bg-white shadow-sm border border-slate-100 hover:text-[#A37FBC] transition-transform active:scale-95"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleViewDossier(obs);
+                                    }}
+                                  >
+                                    <FileText className="h-4 w-4 mr-2" />
+                                    Review Dossier
+                                  </Button>
                                 </div>
-                              </div>
-                              <Badge
-                                className={`rounded-full px-5 py-1 text-[10px] font-black uppercase tracking-widest border-none shadow-sm ${obs.status === 'Reflected'
-                                  ? 'bg-emerald-500 text-white'
-                                  : obs.status === 'Acknowledged'
-                                    ? 'bg-blue-500 text-white'
-                                    : 'bg-amber-500 text-white'
-                                  }`}
-                              >
-                                {obs.status}
-                              </Badge>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="p-8 pt-0">
-                            <div className="flex items-center justify-between p-6 bg-slate-50/50 rounded-2xl border border-slate-50 mb-6">
-                              <div>
-                                <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-1">Observation Precision</p>
-                                <p className="text-3xl font-black text-[#A37FBC] tracking-tighter">
-                                  {obs.score} <span className="text-xs text-slate-300 font-bold px-1 select-none">/</span> <span className="text-slate-300">5.0</span>
-                                </p>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                className="rounded-full text-[10px] font-black uppercase tracking-widest bg-white shadow-sm border border-slate-100 hover:text-[#A37FBC] transition-transform active:scale-95"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleViewDossier(obs);
-                                }}
-                              >
-                                <FileText className="h-4 w-4 mr-2" />
-                                Review Dossier
-                              </Button>
-                            </div>
-                            <div className="bg-white/50 p-6 rounded-2xl border border-slate-50 relative">
-                              <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-2 flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#A37FBC]"></div> Recorded Feedback</p>
-                              <p className="text-sm font-semibold text-slate-600 italic tracking-tight leading-relaxed">"{obs.feedback}"</p>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div className="bg-white/50 p-6 rounded-2xl border border-slate-50 relative">
+                                    <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-2 flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-[#A37FBC]"></div> Recorded Feedback</p>
+                                    <p className="text-sm font-semibold text-slate-600 italic tracking-tight leading-relaxed">"{obs.feedback}"</p>
+                                  </div>
+                                  {obs.reflection && (
+                                    <div className="bg-emerald-50/30 p-6 rounded-2xl border border-emerald-100/50 relative">
+                                      <p className="text-[9px] text-emerald-600 uppercase font-black tracking-widest mb-2 flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Teacher Reflection</p>
+                                      <p className="text-sm font-semibold text-emerald-700 tracking-tight leading-relaxed">"{obs.reflection}"</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -649,8 +718,8 @@ export default function SchoolLeaderDashboard() {
                       <CardContent className="p-10 space-y-8 pt-8">
                         <div className="grid grid-cols-3 gap-6">
                           <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-50 text-center">
-                            <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-1">Evaluations</p>
-                            <p className="text-2xl font-black text-slate-900">{teacher.observations}</p>
+                            <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-1">Records</p>
+                            <p className="text-xl font-black text-slate-900 leading-none">{teacher.observations}</p>
                           </div>
                           <div className="bg-slate-50/50 p-4 rounded-2xl border border-slate-50 text-center">
                             <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest mb-1">PD Credits</p>
@@ -693,78 +762,119 @@ export default function SchoolLeaderDashboard() {
             {activeView === 'pd-participation' && (
               <div className="space-y-12">
                 <div className="flex items-center justify-between px-1">
-                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Professional Development Analytics</h2>
+                  <div>
+                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Professional Development Analytics</h2>
+                    <p className="text-sm font-semibold text-slate-400 mt-1 uppercase tracking-widest">Faculty Growth & Engagement Monitoring</p>
+                  </div>
+                  <div className="flex gap-2 bg-white/60 p-2 rounded-2xl border border-slate-100 shadow-sm">
+                    <Button
+                      variant={trainingViewMode === 'calendar' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setTrainingViewMode('calendar')}
+                      className={`rounded-xl text-[10px] font-black uppercase tracking-widest px-6 transition-all ${trainingViewMode === 'calendar'
+                        ? 'bg-[#A37FBC] text-white hover:bg-[#8e6ba8] shadow-md shadow-[#A37FBC]/20'
+                        : 'text-slate-500 hover:text-slate-900'
+                        }`}
+                    >
+                      <Calendar className="h-3 w-3 mr-2" />
+                      Calendar
+                    </Button>
+                    <Button
+                      variant={trainingViewMode === 'analytics' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setTrainingViewMode('analytics')}
+                      className={`rounded-xl text-[10px] font-black uppercase tracking-widest px-6 transition-all ${trainingViewMode === 'analytics'
+                        ? 'bg-[#A37FBC] text-white hover:bg-[#8e6ba8] shadow-md shadow-[#A37FBC]/20'
+                        : 'text-slate-500 hover:text-slate-900'
+                        }`}
+                    >
+                      <LayoutGrid className="h-3.5 w-3.5 mr-2" />
+                      Analytics
+                    </Button>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <Card className="bg-white/60 backdrop-blur-2xl border-none rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.03)] overflow-hidden">
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-[#A37FBC]"></div>
-                    <CardHeader className="p-8">
-                      <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">School Participation</CardTitle>
-                      <div className="text-4xl font-black text-slate-900 mt-2">{avgPdRate}%</div>
-                      <CardDescription className="text-xs font-bold text-slate-500 pt-2 uppercase tracking-wide">Average Attendance Rate</CardDescription>
-                    </CardHeader>
-                  </Card>
-                  <Card className="bg-white/60 backdrop-blur-2xl border-none rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.03)] overflow-hidden">
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
-                    <CardHeader className="p-8">
-                      <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Events Conducted</CardTitle>
-                      <div className="text-4xl font-black text-slate-900 mt-2">{getTrainingEvents().filter(e => e.status !== 'Upcoming').length}</div>
-                      <CardDescription className="text-xs font-bold text-slate-500 pt-2 uppercase tracking-wide">Workshops & Seminars</CardDescription>
-                    </CardHeader>
-                  </Card>
-                  <Card className="bg-white/60 backdrop-blur-2xl border-none rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.03)] overflow-hidden">
-                    <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
-                    <CardHeader className="p-8">
-                      <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Leading Campus</CardTitle>
-                      <div className="text-2xl font-black text-slate-900 mt-2 tracking-tight">City Campus</div>
-                      <CardDescription className="text-xs font-bold text-slate-500 pt-2 uppercase tracking-wide">Highest Engagement</CardDescription>
-                    </CardHeader>
-                  </Card>
-                </div>
-
-                <Card className="bg-white/60 backdrop-blur-md border-none rounded-[3rem] shadow-sm overflow-hidden">
-                  <CardHeader className="p-10 border-b border-black/[0.02]">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <CardTitle className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Participation Report</CardTitle>
-                        <CardDescription className="text-sm font-semibold text-slate-400 mt-1 uppercase tracking-widest">Faculty Attendance & Engagement</CardDescription>
-                      </div>
+                {trainingViewMode === 'calendar' ? (
+                  <div className="space-y-8">
+                    <TrainingCalendar
+                      events={getTrainingEvents()}
+                      onRegister={handleRegisterTraining}
+                      getTrainingStatus={getTrainingStatus}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      <Card className="bg-white/60 backdrop-blur-2xl border-none rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.03)] overflow-hidden">
+                        <div className="absolute top-0 left-0 w-1.5 h-full bg-[#A37FBC]"></div>
+                        <CardHeader className="p-8">
+                          <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">School Participation</CardTitle>
+                          <div className="text-4xl font-black text-slate-900 mt-2">{avgPdRate}%</div>
+                          <CardDescription className="text-xs font-bold text-slate-500 pt-2 uppercase tracking-wide">Average Attendance Rate</CardDescription>
+                        </CardHeader>
+                      </Card>
+                      <Card className="bg-white/60 backdrop-blur-2xl border-none rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.03)] overflow-hidden">
+                        <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+                        <CardHeader className="p-8">
+                          <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Events Conducted</CardTitle>
+                          <div className="text-4xl font-black text-slate-900 mt-2">{getTrainingEvents().filter(e => e.status !== 'Upcoming').length}</div>
+                          <CardDescription className="text-xs font-bold text-slate-500 pt-2 uppercase tracking-wide">Workshops & Seminars</CardDescription>
+                        </CardHeader>
+                      </Card>
+                      <Card className="bg-white/60 backdrop-blur-2xl border-none rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.03)] overflow-hidden">
+                        <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+                        <CardHeader className="p-8">
+                          <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Leading Campus</CardTitle>
+                          <div className="text-2xl font-black text-slate-900 mt-2 tracking-tight">City Campus</div>
+                          <CardDescription className="text-xs font-bold text-slate-500 pt-2 uppercase tracking-wide">Highest Engagement</CardDescription>
+                        </CardHeader>
+                      </Card>
                     </div>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <Table>
-                      <TableHeader className="bg-slate-50/50">
-                        <TableRow className="border-b border-black/[0.03]">
-                          <TableHead className="pl-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">Faculty Name</TableHead>
-                          <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Campus</TableHead>
-                          <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Events Attended</TableHead>
-                          <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest w-1/3">Participation Rate</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {pdStats.map((t) => (
-                          <TableRow key={t.empId} className="border-b border-black/[0.01] hover:bg-[#A37FBC]/[0.02] transition-colors group">
-                            <TableCell className="pl-10">
-                              <div className="font-black text-slate-900 tracking-tight">{t.name}</div>
-                              <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wide mt-0.5">{t.designation}</div>
-                            </TableCell>
-                            <TableCell className="font-bold text-slate-500 text-xs">{t.campus}</TableCell>
-                            <TableCell className="font-black text-slate-900 text-xs">
-                              {t.attended} <span className="text-slate-300">/</span> {t.totalEvents}
-                            </TableCell>
-                            <TableCell className="pr-10">
-                              <div className="flex items-center gap-4">
-                                <Progress value={t.rate} className="h-2 bg-slate-100 flex-1" />
-                                <span className="text-xs font-black text-[#A37FBC] w-8">{t.rate}%</span>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
+
+                    <Card className="bg-white/60 backdrop-blur-md border-none rounded-[3rem] shadow-sm overflow-hidden">
+                      <CardHeader className="p-10 border-b border-black/[0.02]">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <CardTitle className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Participation Report</CardTitle>
+                            <CardDescription className="text-sm font-semibold text-slate-400 mt-1 uppercase tracking-widest">Faculty Attendance & Engagement</CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-0">
+                        <Table>
+                          <TableHeader className="bg-slate-50/50">
+                            <TableRow className="border-b border-black/[0.03]">
+                              <TableHead className="pl-10 font-black uppercase text-[10px] text-slate-400 tracking-widest">Faculty Name</TableHead>
+                              <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Campus</TableHead>
+                              <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest">Events Attended</TableHead>
+                              <TableHead className="font-black uppercase text-[10px] text-slate-400 tracking-widest w-1/3">Participation Rate</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {pdStats.map((t) => (
+                              <TableRow key={t.empId} className="border-b border-black/[0.01] hover:bg-[#A37FBC]/[0.02] transition-colors group">
+                                <TableCell className="pl-10">
+                                  <div className="font-black text-slate-900 tracking-tight">{t.name}</div>
+                                  <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wide mt-0.5">{t.designation}</div>
+                                </TableCell>
+                                <TableCell className="font-bold text-slate-500 text-xs">{t.campus}</TableCell>
+                                <TableCell className="font-black text-slate-900 text-xs">
+                                  {t.attended} <span className="text-slate-300">/</span> {t.totalEvents}
+                                </TableCell>
+                                <TableCell className="pr-10">
+                                  <div className="flex items-center gap-4">
+                                    <Progress value={t.rate} className="h-2 bg-slate-100 flex-1" />
+                                    <span className="text-xs font-black text-[#A37FBC] w-8">{t.rate}%</span>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+                  </>
+                )}
               </div>
             )}
 
@@ -977,123 +1087,6 @@ export default function SchoolLeaderDashboard() {
               </DialogContent>
             </Dialog>
 
-            {/* Teacher Vector Dialog */}
-            <Dialog open={vectorDialogOpen} onOpenChange={setVectorDialogOpen}>
-              <DialogContent className="max-w-4xl h-[90vh] bg-[#fdfdfd] border-none rounded-[3rem] shadow-2xl p-0 overflow-hidden flex flex-col">
-                <ScrollArea className="flex-1">
-                  <div className="p-12 space-y-12">
-                    <DialogHeader>
-                      <div className="flex items-center gap-8">
-                        <div className="w-24 h-24 rounded-[2.5rem] bg-[#A37FBC]/10 flex items-center justify-center text-[#A37FBC] font-black text-4xl border border-[#A37FBC]/10 shadow-inner">
-                          {selectedTeacherForAction?.name[0]}
-                        </div>
-                        <div>
-                          <DialogTitle className="text-5xl font-black text-slate-900 uppercase tracking-tighter leading-none mb-3">{selectedTeacherForAction?.name}</DialogTitle>
-                          <div className="flex items-center gap-4">
-                            <Badge variant="outline" className="text-[10px] font-black text-[#A37FBC] border-[#A37FBC]/20 px-3 rounded-full uppercase tracking-widest bg-[#A37FBC]/5">
-                              Teacher Profile
-                            </Badge>
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">
-                              Vector: {selectedTeacherForAction?.empId}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </DialogHeader>
-
-                    <div className="grid grid-cols-4 gap-6">
-                      <div className="bg-white p-6 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-50 flex flex-col items-center justify-center text-center">
-                        <p className="text-[9px] text-slate-400 uppercase font-black tracking-[0.2em] mb-3">Precision Avg</p>
-                        <p className="text-3xl font-black text-[#A37FBC] leading-none mb-1">{selectedTeacherForAction?.avgScore}</p>
-                        <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest">/ 5.0</p>
-                      </div>
-                      <div className="bg-white p-6 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-50 flex flex-col items-center justify-center text-center">
-                        <p className="text-[9px] text-slate-400 uppercase font-black tracking-[0.2em] mb-3">Observation Records</p>
-                        <p className="text-3xl font-black text-slate-900 leading-none">{selectedTeacherForAction?.observations}</p>
-                      </div>
-                      <div className="bg-white p-6 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-50 flex flex-col items-center justify-center text-center">
-                        <p className="text-[9px] text-slate-400 uppercase font-black tracking-[0.2em] mb-3">PD Credits</p>
-                        <p className="text-3xl font-black text-slate-900 leading-none mb-1">{selectedTeacherForAction?.pdHours}</p>
-                        <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest">/ 50</p>
-                      </div>
-                      <div className="bg-white p-6 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-slate-50 flex flex-col items-center justify-center text-center">
-                        <p className="text-[9px] text-slate-400 uppercase font-black tracking-[0.2em] mb-3">Path Progress</p>
-                        <p className="text-3xl font-black text-emerald-500 leading-none">{Math.round((selectedTeacherForAction?.pdHours / 50) * 100)}%</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-12">
-                      <section>
-                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full bg-[#A37FBC]"></div>
-                          Professional Objectives
-                        </h4>
-                        <div className="space-y-4">
-                          {selectedTeacherForAction && getGoalsByTeacher(selectedTeacherForAction.empId).length === 0 ? (
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest py-8 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200">No active growth vectors assigned</p>
-                          ) : (
-                            selectedTeacherForAction && getGoalsByTeacher(selectedTeacherForAction.empId).map(goal => (
-                              <div key={goal.id} className="p-8 bg-white border border-slate-50 rounded-[2.5rem] shadow-sm group hover:border-[#A37FBC]/20 transition-all space-y-6">
-                                <div className="flex justify-between items-center">
-                                  <div>
-                                    <h5 className="text-xl font-black text-slate-900 uppercase tracking-tight">{goal.title}</h5>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Status: {goal.status} <span className="text-[#A37FBC] mx-2">•</span> Target: {new Date(goal.target).toLocaleDateString()}</p>
-                                  </div>
-                                  <div className="text-right">
-                                    <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">Velocity</p>
-                                    <p className="text-lg font-black text-[#A37FBC]">{goal.progress}%</p>
-                                  </div>
-                                </div>
-                                <div className="relative w-full h-2 bg-[#A37FBC]/10 rounded-full overflow-hidden">
-                                  <div
-                                    className="absolute top-0 left-0 h-full bg-[#A37FBC] transition-all duration-1000"
-                                    style={{ width: `${goal.progress}%` }}
-                                  ></div>
-                                </div>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </section>
-
-                      <section>
-                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
-                          Observation History
-                        </h4>
-                        <div className="space-y-4">
-                          {selectedTeacherForAction && getObservationsByTeacher(selectedTeacherForAction.empId).length === 0 ? (
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest py-8 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200">No telemetry records available</p>
-                          ) : (
-                            selectedTeacherForAction && getObservationsByTeacher(selectedTeacherForAction.empId).map(obs => (
-                              <div key={obs.id} className="p-6 bg-white border border-slate-50 rounded-3xl shadow-sm group hover:border-indigo-100 transition-all">
-                                <div className="flex justify-between items-start mb-4">
-                                  <div>
-                                    <h5 className="font-black text-slate-900 uppercase tracking-tight">{obs.domain}</h5>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{new Date(obs.date).toLocaleDateString()} <span className="mx-2">•</span> Observer: {obs.observerName}</p>
-                                  </div>
-                                  <div className="text-xl font-black text-[#A37FBC]">{obs.score}<span className="text-[10px] text-slate-300 ml-1">/5.0</span></div>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                  <p className="text-xs font-medium text-slate-500 italic leading-relaxed flex-1 mr-8">"{obs.feedback}"</p>
-                                  <Button
-                                    variant="ghost"
-                                    className="rounded-full text-[9px] font-black uppercase tracking-widest bg-white shadow-sm border border-slate-100 hover:text-[#A37FBC] px-4"
-                                    onClick={() => handleViewDossier(obs)}
-                                  >
-                                    Review Dossier
-                                  </Button>
-                                </div>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </section>
-                    </div>
-                  </div>
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
 
             {/* Pedagogy Dossier Dialog */}
             <Dialog open={dossierDialogOpen} onOpenChange={setDossierDialogOpen}>
@@ -1211,6 +1204,20 @@ export default function SchoolLeaderDashboard() {
                 </div>
               </DialogContent>
             </Dialog>
+
+            {activeView === 'profile' && (
+              <ProfileDashboard
+                user={currentUser}
+                onBack={() => setActiveView('observe')}
+              />
+            )}
+
+            {activeView === 'masterForm' && (
+              <MasterObservationForm
+                onBack={() => setActiveView('observe')}
+                onSuccess={() => setActiveView('observe')}
+              />
+            )}
           </div>
         </div>
         {/* Mini Footer */}

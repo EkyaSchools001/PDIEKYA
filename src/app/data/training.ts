@@ -8,6 +8,8 @@ export interface TrainingEvent {
   status: 'Upcoming' | 'Open' | 'Attended' | 'Completed';
   capacity: number;
   enrolled: number;
+  registrationDeadline: string;
+  color: string;
 }
 
 export interface TrainingAttendance {
@@ -29,6 +31,8 @@ export const trainingEvents: TrainingEvent[] = [
     status: 'Upcoming',
     capacity: 30,
     enrolled: 15,
+    registrationDeadline: '2026-02-03',
+    color: '#A37FBC',
   },
   {
     id: 'TRN002',
@@ -40,6 +44,8 @@ export const trainingEvents: TrainingEvent[] = [
     status: 'Open',
     capacity: 50,
     enrolled: 22,
+    registrationDeadline: '2026-02-10',
+    color: '#3B82F6',
   },
   {
     id: 'TRN003',
@@ -51,6 +57,8 @@ export const trainingEvents: TrainingEvent[] = [
     status: 'Completed',
     capacity: 25,
     enrolled: 25,
+    registrationDeadline: '2026-01-20',
+    color: '#10B981',
   },
   {
     id: 'TRN004',
@@ -62,6 +70,8 @@ export const trainingEvents: TrainingEvent[] = [
     status: 'Open',
     capacity: 20,
     enrolled: 12,
+    registrationDeadline: '2026-02-06',
+    color: '#F59E0B',
   },
   {
     id: 'TRN005',
@@ -73,6 +83,8 @@ export const trainingEvents: TrainingEvent[] = [
     status: 'Upcoming',
     capacity: 35,
     enrolled: 18,
+    registrationDeadline: '2026-02-13',
+    color: '#F43F5E',
   },
 ];
 

@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/app
 import { Badge } from '@/app/components/ui/badge';
 import {
   PlusCircle, Edit, Trash2, Bell, LucideIcon, LayoutDashboard, ChevronRight, Shield, Search, Terminal, CheckCircle2,
-  Globe, Image, Type, ArrowLeft, Link as IconLink, LogOut, Users, FileText, BookOpen, Settings, BarChart3, Calendar
+  Globe, Image, Type, ArrowLeft, Link as IconLink, LogOut, Users, FileText, BookOpen, Settings, BarChart3, Calendar, TrendingUp
 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/app/components/ui/table';
 import { ScrollArea } from '@/app/components/ui/scroll-area';
@@ -21,6 +21,7 @@ import {
 } from '@/app/components/ui/select';
 import { Label } from '@/app/components/ui/label';
 import { Progress } from '@/app/components/ui/progress';
+import ProfileDashboard from '@/app/components/ProfileDashboard';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -77,7 +78,17 @@ export default function AdminDashboard() {
   const [newImgForm, setNewImgForm] = useState({ url: '', cap: '' });
 
   // Training State
-  const [newTraining, setNewTraining] = useState({ title: '', date: '', time: '', campus: 'City Campus', topic: '', capacity: 30, status: 'Upcoming' as any });
+  const [newTraining, setNewTraining] = useState({
+    title: '',
+    date: '',
+    time: '',
+    campus: 'City Campus',
+    topic: '',
+    capacity: 30,
+    status: 'Upcoming' as any,
+    registrationDeadline: '',
+    color: '#3B82F6'
+  });
   const [editingTraining, setEditingTraining] = useState<any>(null);
   const [isAddTrainingOpen, setIsAddTrainingOpen] = useState(false);
   const [isEditTrainingOpen, setIsEditTrainingOpen] = useState(false);
@@ -214,11 +225,23 @@ export default function AdminDashboard() {
     e.preventDefault();
     addTrainingEvent({
       ...newTraining,
+      registrationDeadline: newTraining.registrationDeadline || newTraining.date,
+      color: newTraining.color || '#3B82F6',
       enrolled: 0,
       status: 'Open'
     });
     setIsAddTrainingOpen(false);
-    setNewTraining({ title: '', date: '', time: '', campus: 'City Campus', topic: '', capacity: 30, status: 'Upcoming' });
+    setNewTraining({
+      title: '',
+      date: '',
+      time: '',
+      campus: 'City Campus',
+      topic: '',
+      capacity: 30,
+      status: 'Upcoming',
+      registrationDeadline: '',
+      color: '#3B82F6'
+    });
   };
 
   const handleUpdateTraining = (e: React.FormEvent) => {
@@ -295,15 +318,19 @@ export default function AdminDashboard() {
         </nav>
 
         <div className="p-8 border-t border-black/[0.03] bg-white/40">
-          <div className="flex items-center px-2">
-            <div className="w-10 h-10 rounded-2xl bg-[#A37FBC]/10 flex items-center justify-center text-[#A37FBC] font-black mr-4 text-sm border border-[#A37FBC]/10 shadow-inner text-center">
+          <button
+            onClick={() => setActiveView('profile')}
+            className="flex items-center px-2 w-full hover:bg-white/50 rounded-2xl p-3 transition-all group"
+          >
+            <div className="w-10 h-10 rounded-2xl bg-[#A37FBC]/10 flex items-center justify-center text-[#A37FBC] font-black mr-4 text-sm border border-[#A37FBC]/10 shadow-inner text-center group-hover:bg-[#A37FBC] group-hover:text-white transition-all">
               {currentUser.name[0]}
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-black text-slate-900 truncate tracking-tight">{currentUser.name}</p>
-              <p className="text-[10px] text-slate-400 truncate uppercase font-bold tracking-widest">Global Admin</p>
+            <div className="min-w-0 flex-1 text-left">
+              <p className="text-sm font-black text-slate-900 truncate tracking-tight group-hover:text-[#A37FBC] transition-colors">{currentUser.name}</p>
+              <p className="text-[10px] text-slate-400 truncate uppercase font-bold tracking-widest">View Profile</p>
             </div>
-          </div>
+            <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-[#A37FBC] transition-colors" />
+          </button>
         </div>
       </aside>
 
@@ -767,6 +794,13 @@ export default function AdminDashboard() {
                           <TableCell className="font-bold text-slate-500 text-xs">{user.campus}</TableCell>
                           <TableCell className="text-right pr-10">
                             <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                size="sm" variant="ghost" className="rounded-xl hover:bg-[#A37FBC]/10 hover:text-[#A37FBC] shadow-sm flex items-center gap-2 px-3"
+                                onClick={() => navigate(`/admin/vector/${user.empId}`)}
+                              >
+                                <TrendingUp className="h-3.5 w-3.5" />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Growth Vector</span>
+                              </Button>
                               <Button size="sm" variant="ghost" className="rounded-xl hover:bg-white hover:text-[#A37FBC] shadow-sm"><Edit className="h-4 w-4" /></Button>
                               <Button size="sm" variant="ghost" className="rounded-xl hover:bg-rose-50 hover:text-rose-600 shadow-sm" onClick={() => handleDeleteUser(user.empId)}><Trash2 className="h-4 w-4" /></Button>
                             </div>
@@ -1028,15 +1062,11 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* Placeholder for other views */}
-            {(activeView === 'reports' || activeView === 'settings') && (
-              <div className="flex flex-col items-center justify-center p-20 py-40 bg-white/40 backdrop-blur-md rounded-[4rem] border-2 border-dashed border-slate-100 text-center">
-                <div className="p-8 bg-slate-50 rounded-full mb-8">
-                  <LayoutDashboard className="h-16 w-16 text-slate-200" />
-                </div>
-                <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Module Synchronizing</h3>
-                <p className="text-sm font-semibold text-slate-400 mt-2 uppercase tracking-[0.3em]">Telemetry Link Established. Visual Overhaul Pending.</p>
-              </div>
+            {activeView === 'profile' && (
+              <ProfileDashboard
+                user={currentUser}
+                onBack={() => setActiveView('overview')}
+              />
             )}
 
             {/* Mini Footer */}

@@ -92,6 +92,19 @@ export const observations: Observation[] = [
     tags: ['P1', 'Acknowledged'],
     status: 'Acknowledged',
   },
+  {
+    id: 'OBS007',
+    teacherId: 'Ekya001',
+    teacherName: 'Elena',
+    observerId: 'EkyaH001',
+    observerName: 'Kai',
+    date: '2026-02-01',
+    domain: 'Instructional Planning',
+    score: 4.8,
+    feedback: 'Exceptional alignment with curriculum standards. The lesson objectives were clearly communicated and achieved.',
+    tags: ['Master Form', 'Head of School'],
+    status: 'Pending',
+  },
 ];
 
 export const getObservationsByTeacher = (teacherId: string): Observation[] => {

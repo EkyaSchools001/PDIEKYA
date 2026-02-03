@@ -12,6 +12,7 @@ import SchoolLeaderDashboard from "@/app/components/SchoolLeaderDashboard";
 import AdminDashboard from "@/app/components/AdminDashboard";
 import ForgotPassword from "@/app/components/ForgotPassword";
 import LoginRoleSelection from "@/app/components/LoginRoleSelection";
+import TeacherVectorProfile from "@/app/components/TeacherVectorProfile";
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/teacher" element={<TeacherDashboard />} />
           <Route path="/school-leader" element={<SchoolLeaderDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/:role/vector/:teacherId" element={<TeacherVectorProfile />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>

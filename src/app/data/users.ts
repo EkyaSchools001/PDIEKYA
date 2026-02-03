@@ -5,6 +5,8 @@ export interface User {
   designation: string;
   campus: string;
   password: string;
+  profilePicture?: string;
+  department?: string;
 }
 
 export const teachers: User[] = [
