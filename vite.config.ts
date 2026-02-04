@@ -21,4 +21,7 @@ export default defineConfig({
       overlay: false,
     },
   },
+  preview: {
+    allowedHosts: ['pdiekya.onrender.com'],
+  },
 })
